@@ -1,0 +1,4088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Operations Manager</title>
+<style>
+:root {
+  --navy: #0f2744;
+  --navy-2: #16355c;
+  --accent: #c9a227;
+  --accent-dark: #a8861b;
+  --bg: #eef1f6;
+  --card: #ffffff;
+  --text: #1c2430;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --danger: #c0392b;
+  --ok: #0f766e;
+  --shadow: 0 10px 30px rgba(15, 39, 68, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Calibri, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h2, h3, h4 { margin: 0 0 12px; }
+
+.muted { color: var(--muted); font-size: 13px; }
+
+button, input, select {
+  font-family: inherit;
+}
+
+input, select {
+  width: 100%;
+  padding: 11px 12px;
+  margin: 0;
+  border: 1px solid #d5dbe3;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  color: var(--text);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #c9a227;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.18);
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: #fff;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-primary:hover { background: var(--navy-2); }
+
+.btn-edit {
+  background: #e8eef8;
+  color: var(--navy);
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.btn-delete {
+  background: #fdecea;
+  color: var(--danger);
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.actions { display: flex; gap: 8px; }
+
+/* LOGIN */
+body.booting #loginPage { display: none !important; }
+#loginPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(15,39,68,.88), rgba(15,39,68,.7)),
+    url("images_1.jpg") center/cover no-repeat;
+}
+
+.login-box {
+  background: #fff;
+  padding: 36px 32px;
+  border-radius: 16px;
+  width: 380px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.25);
+}
+
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--navy);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.sidebar .brand-mark {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 0;
+  background: #16355c;
+}
+
+.login-brand { font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 8px; }
+.login-box h2 { font-size: 24px; }
+.login-box p { margin: 0 0 22px; color: var(--muted); }
+.login-box label { display: block; margin: 12px 0 6px; font-size: 13px; font-weight: 600; }
+.login-box .btn-primary { width: 100%; margin-top: 16px; }
+
+/* APP SHELL */
+#dashboard { display: none; }
+.container { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 250px;
+  background: var(--navy);
+  color: #fff;
+  padding: 22px 16px;
+  flex-shrink: 0;
+}
+
+.sidebar .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 22px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  margin-bottom: 18px;
+}
+
+.sidebar .logo span { font-weight: 700; letter-spacing: .2px; }
+.sidebar .nav-label {
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #9bb0c9;
+  padding: 0 10px 8px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 11px 12px;
+  margin: 4px 0;
+  background: transparent;
+  color: #d7e2ef;
+  text-align: left;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+  background: rgba(201, 162, 39, .18);
+  color: #fff;
+}
+
+.main {
+  flex: 1;
+  padding: 24px 28px 40px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.title { font-size: 22px; font-weight: 700; }
+.subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  padding: 8px 10px 8px 8px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+
+.profile img { width: 36px; height: 36px; border-radius: 50%; }
+.profile .who { font-size: 13px; font-weight: 600; }
+.profile .role { font-size: 11px; color: var(--muted); }
+
+.logout {
+  background: #f3f4f6;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+
+.card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid #edf0f4;
+}
+
+.section { display: none; }
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 140px 1.4fr 1.2fr 110px auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.g-labour { grid-template-columns: 130px 1.4fr 1.2fr 150px auto; }
+.g-labour .form-btns { display: flex; gap: 8px; flex-wrap: nowrap; }
+.g-labour .form-btns button { white-space: nowrap; }
+.emp-table { table-layout: fixed; }
+.emp-table th, .emp-table td { padding: 12px 24px; word-break: break-word; }
+.pager-gap { padding: 6px 4px; color: #64748b; font-size: 13px; font-weight: 600; align-self: center; }
+.pager { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.pager-info { font-size: 13px; color: #64748b; }
+.pager-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.pager-btn { padding: 6px 11px; border-radius: 6px; background: #eef1f5; color: #334155; font-weight: 600; font-size: 13px; }
+.pager-btn:hover:not(:disabled) { background: #e2e8f0; }
+.pager-btn.active { background: var(--navy); color: #fff; }
+.pager-btn:disabled { opacity: .45; cursor: default; }
+.pager-btn.active:disabled { opacity: 1; }
+.head-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.emp-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.emp-head h4 { margin: 0; }
+.emp-search { width: 100%; max-width: 320px; }
+.g-wage { grid-template-columns: 1.5fr 110px 1fr 1.1fr 1fr auto; }
+.g-week { grid-template-columns: 1.6fr 120px 1fr auto; }
+.g-month { grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 16px; }
+.g-month input, .g-month select {
+  padding: 13px 14px;
+  font-size: 15px;
+  min-height: 46px;
+}
+.g-month .btn-primary {
+  width: 100%;
+  min-height: 46px;
+  padding: 13px 18px;
+  font-size: 15px;
+}
+.g-month-2 { grid-template-columns: repeat(5, minmax(0, 1fr)) auto; gap: 12px; }
+.g-month-2 .form-actions { flex-wrap: nowrap; gap: 8px; }
+.g-month-2 .form-actions button { white-space: nowrap; min-height: 42px; padding: 10px 16px; }
+.month-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.month-actions button {
+  flex: 0 0 auto;
+  min-width: 130px;
+  white-space: nowrap;
+}
+.month-date-wrap {
+  min-width: 210px;
+}
+.month-date-wrap label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+.g-att { grid-template-columns: 220px auto; }
+
+.form-actions { display: flex; gap: 8px; }
+
+.btn-clear {
+  background: #eef1f5;
+  color: #334155;
+  padding: 11px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.total-box {
+  background: #f8fafc;
+  border: 1px dashed #d5dbe3;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+.readonly {
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+
+.table-wrap { overflow-x: auto; }
+
+/* WEEKLY EXPENDITURE */
+.stats.stats-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.att-grid.wk-grid { min-width: 560px; }
+.att-grid.wk-grid td input { min-width: 92px; font-size: 14px; }
+.att-grid.wk-grid td.wk-cell { background: #fff; }
+.att-grid.wk-grid thead th.att-sun { background: #eef4ff; color: var(--navy); border-color: var(--line); }
+.att-grid.wk-grid td.wk-cell input:focus { background: #fff; }
+.att-grid.wk-grid thead th { padding: 11px 10px; white-space: nowrap; }
+.stats-navy .stat { background: linear-gradient(135deg, var(--navy), var(--navy-2)); border-color: transparent; box-shadow: var(--shadow); }
+.stats-navy .stat .k { color: #d6dfec; }
+.stats-navy .stat .v { color: #fff; }
+/* WORK AND TASK */
+.g-task { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g-task .span2 { grid-column: span 2; }
+.g-task .span3 { grid-column: span 3; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: #eef4ff; color: var(--navy); border-radius: 999px; padding: 5px 6px 5px 12px; font-weight: 600; font-size: 13px; }
+.chip button { width: 20px; height: 20px; padding: 0; border-radius: 50%; background: #d3dff3; color: var(--navy); font-size: 14px; line-height: 1; }
+.chip button:hover { background: var(--danger); color: #fff; }
+.st-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.st-todo { background: #eceff3; color: #475569; }
+.st-prog { background: #fbf1cf; color: #8a6d0b; }
+.st-done { background: #d9f2ee; color: var(--ok); }
+.names-cell { color: var(--muted); font-size: 13px; margin-top: 3px; }
+.report-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.report-bar .field { display: flex; align-items: center; gap: 10px; }
+.report-bar .field label { margin: 0; font-weight: 700; color: var(--navy); white-space: nowrap; }
+.report-bar input[type=date] { width: 180px; }
+.report-sum { font-weight: 700; color: var(--navy); }
+/* ADVANCE PAYMENT */
+.big-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.big-row .big-total { margin-bottom: 0; }
+.big-total { background: linear-gradient(135deg, var(--navy), var(--navy-2)); color: #fff; border-radius: 14px; padding: 22px 26px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.big-total .k { font-size: 14px; font-weight: 600; color: #d6dfec; }
+.big-total .v { font-size: 46px; font-weight: 800; line-height: 1.15; margin-top: 6px; color: #fff; }
+.big-total .k small { margin-left: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(201, 162, 39, 0.2); color: var(--accent); font-size: 13px; font-weight: 700; }
+.picker { position: relative; }
+.picker-x { display: none; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: #eef1f5; color: #475569; font-size: 18px; line-height: 1; align-items: center; justify-content: center; padding: 0; }
+.picker-x:hover { background: var(--danger); color: #fff; }
+.picker.open .picker-x { display: flex; }
+.picker input:not(:placeholder-shown) + .picker-x { display: flex; }
+.picker input:not(:placeholder-shown) { padding-right: 42px; }
+.att-actions .search-wrap { flex: 0 1 320px; }
+.search-wrap { position: relative; min-width: 0; width: 100%; max-width: 320px; }
+.search-wrap .emp-search { width: 100%; max-width: none; padding-right: 42px; }
+.search-x { display: none; position: absolute; right: 9px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; padding: 0; border-radius: 50%; background: #eef1f5; color: #475569; font-size: 18px; line-height: 1; align-items: center; justify-content: center; }
+.search-x:hover { background: var(--danger); color: #fff; }
+.search-wrap input:not(:placeholder-shown) + .search-x { display: flex; }
+.picker.open input { padding-right: 42px; }
+.icon-btn { width: 34px; height: 34px; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; }
+.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.btn-dl { background: #e3f4f1; color: var(--ok); padding: 7px 12px; border-radius: 6px; font-weight: 600; }
+.btn-dl:hover { background: #d3ece8; }
+.picker-list { display: none; position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 4px); max-height: 240px; overflow-y: auto; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+.picker-list.open { display: block; }
+.picker-item { padding: 9px 12px; cursor: pointer; font-size: 14px; }
+.picker-item small { color: var(--muted); margin-left: 6px; }
+.picker-item:hover, .picker-item.active { background: #eef4ff; }
+.picker-none { padding: 10px 12px; color: var(--muted); font-size: 13px; }
+
+/* ATTENDANCE GRID */
+.att-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.att-month { display: flex; align-items: center; gap: 10px; }
+.att-month label { margin: 0; font-weight: 700; color: var(--navy); white-space: nowrap; }
+.att-month input { width: 190px; }
+.att-actions { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; justify-content: flex-end; flex-wrap: wrap; }
+.att-actions .emp-search { flex: 0 1 320px; }
+.att-actions button { white-space: nowrap; }
+.att-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+.att-grid { border-collapse: collapse; width: 100%; min-width: 1100px; font-size: 13px; }
+.att-grid th, .att-grid td { border: 1px solid var(--line); padding: 0; text-align: center; }
+.att-grid thead th { background: var(--navy); color: #fff; font-weight: 700; padding: 10px 4px; border-color: var(--navy-2); }
+.att-grid thead th.att-sun { background: var(--accent); color: var(--navy); border-color: var(--accent-dark); }
+.att-grid thead th.att-name { min-width: 150px; position: sticky; left: 0; z-index: 2; }
+.att-grid thead th.att-total { background: var(--navy-2); color: #fff; }
+.att-grid td.att-name { background: #eef4ff; color: var(--navy); font-weight: 700; padding: 8px 10px; position: sticky; left: 0; z-index: 1; white-space: nowrap; }
+.att-grid td input { width: 100%; min-width: 34px; border: 0; background: transparent; text-align: center; font-weight: 600; color: var(--text); padding: 8px 2px; border-radius: 0; box-shadow: none; }
+.att-grid td input:focus { background: #fff8e1; outline: 2px solid var(--accent); outline-offset: -2px; }
+.att-grid td.att-sun-col { background: #fbf6e3; }
+.att-grid td.att-total { background: #eef4ff; color: var(--navy); font-weight: 700; padding: 8px 10px; min-width: 60px; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background: #f6f8fb;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #5b6777;
+  text-align: left;
+}
+
+.table th, .table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody tr:hover { background: #fbfcfe; }
+
+.badge {
+  display: inline-block;
+  background: #eef4ff;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.empty {
+  text-align: center;
+  padding: 28px 12px;
+  color: var(--muted);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  border: 1px solid #edf0f4;
+}
+
+.stat .k { font-size: 12px; color: var(--muted); font-weight: 600; }
+.stat .v { font-size: 24px; font-weight: 800; margin-top: 6px; color: var(--navy); }
+
+.slider {
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.slide-dots { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 14px; }
+.slide-dots .dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: #d9dee6; cursor: pointer; transition: width .25s, background .25s; }
+.slide-dots .dot:hover { background: #b9c2cf; }
+.slide-dots .dot.active { width: 24px; background: #7a8594; }
+
+.slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.toast {
+  position: fixed;
+
+  
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: none;
+  box-shadow: var(--shadow);
+  z-index: 100;
+}
+
+.row-new { animation: flash 1.4s ease; }
+
+@keyframes flash {
+  from { background: #fff7d6; }
+  to { background: transparent; }
+}
+
+
+/* PROFILE */
+.profile-link { display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 999px; }
+.profile-link:hover .who { text-decoration: underline; }
+.profile img { object-fit: cover; }
+.profile-hero { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.avatar-block { display: flex; flex-direction: column; align-items: center; }
+.avatar-lg { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: #eef1f5; border: 3px solid #fff; box-shadow: var(--shadow); }
+.avatar-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+.avatar-actions button { padding: 7px 12px; font-size: 12px; }
+.hero-info h3 { margin: 0 0 4px; font-size: 22px; }
+.hero-info .badge { margin-top: 10px; }
+.g-profile { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.form-actions-row { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.ro-note { display: none; background: #fff7e6; border: 1px solid #ffe2a8; color: #8a5a00; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; font-size: 13px; }
+body.ro .section:not(#profileSection) .btn-primary:not(.keep),
+body.ro .section:not(#profileSection) .btn-edit,
+body.ro .section:not(#profileSection) .btn-delete,
+body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !important; }
+
+/* MODAL */
+.modal-backdrop { display: none; position: fixed; inset: 0; z-index: 90; background: rgba(15, 39, 68, 0.55); align-items: center; justify-content: center; padding: 16px; }
+.modal-backdrop.open { display: flex; }
+.modal { background: #fff; border-radius: 14px; width: 100%; max-width: 540px; max-height: calc(100vh - 32px); overflow: visible; box-shadow: 0 24px 60px rgba(15, 39, 68, 0.35); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.modal-head h4 { margin: 0; font-size: 18px; }
+.modal-x { width: 32px; height: 32px; padding: 0; border-radius: 50%; background: #eef1f5; color: #475569; font-size: 20px; line-height: 1; }
+.modal-x:hover { background: var(--danger); color: #fff; }
+.modal-body { padding: 20px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px 20px; }
+
+#profPickList { top: 100%; max-height: none; overflow: visible; }
+.picker-select input { cursor: pointer; padding-right: 34px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center; }
+.picker-item.has-sub { position: relative; display: flex; justify-content: space-between; align-items: center; }
+.picker-item .chev { color: var(--muted); font-size: 18px; line-height: 1; margin-left: 12px; }
+.sub-menu { display: none; position: absolute; left: 100%; top: -1px; min-width: 170px; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); z-index: 40; overflow: hidden; }
+.picker-item.has-sub:hover > .sub-menu { display: block; }
+@media (max-width: 700px) {
+  .picker-item.has-sub { flex-wrap: wrap; }
+  .picker-item .chev { display: none; }
+  .sub-menu { display: block; position: static; width: 100%; min-width: 0; border: 0; box-shadow: none; padding-left: 14px; }
+}
+@media (max-height: 600px) { .modal { overflow-y: auto; } }
+
+/* EMPLOYEE MONTH GRID */
+.att-grid.emp-grid { width: max-content; min-width: 100%; }
+.att-grid.emp-grid thead th { padding: 10px 9px; white-space: nowrap; }
+.att-grid.emp-grid td { padding: 8px 9px; font-size: 13px; white-space: nowrap; }
+.att-grid.emp-grid td.att-name { text-align: left; min-width: 190px; }
+.att-grid.emp-grid thead th.att-name { text-align: left; min-width: 190px; }
+.att-grid.emp-grid .nm { font-weight: 700; }
+.att-grid.emp-grid .sub { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 500; color: var(--muted); }
+.att-grid.emp-grid thead th.g-calc { background: var(--navy-2); }
+.att-grid.emp-grid td.c-calc { background: #eef4ff; color: var(--navy); font-weight: 700; }
+.att-grid.emp-grid td.c-amount { background: #fbf1cf; color: var(--navy); font-weight: 800; }
+.att-grid.emp-grid td.c-amount.neg { color: var(--danger); }
+
+/* WORK AND TASK */
+.work-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.work-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.work-tab { background: #eef4ff; color: var(--navy); border-radius: 999px; padding: 10px 18px; font-weight: 700; }
+.work-tab:hover { background: #dfe9fb; }
+.work-tab span { display: inline-block; margin-left: 6px; min-width: 22px; padding: 1px 7px; border-radius: 999px; background: #fff; font-size: 12px; text-align: center; }
+.work-tab.active { background: var(--navy); color: #fff; }
+.work-tab.active span { background: var(--accent); color: var(--navy); }
+.work-hint { margin-top: 12px; color: var(--muted); font-size: 12.5px; }
+.work-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: var(--shadow); border: 1px solid #edf0f4; border-top: 3px solid var(--navy); margin-bottom: 16px; }
+.work-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.work-head h4 { margin: 0 0 6px; font-size: 17px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.work-meta { display: flex; gap: 6px 18px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+.work-meta b { color: var(--navy); font-weight: 700; }
+.work-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.work-actions .btn-primary { padding: 8px 14px; font-size: 13px; }
+.work-photos, .photo-grid { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 14px; }
+.photo-grid { margin: 10px 0 0; }
+.photo-thumb { position: relative; width: 64px; height: 64px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #eef1f5; cursor: pointer; }
+.photo-grid .photo-thumb { width: 78px; height: 78px; }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-thumb .px { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; padding: 0; border-radius: 50%; background: rgba(15, 39, 68, 0.85); color: #fff; font-size: 14px; line-height: 1; }
+.photo-thumb .px:hover { background: var(--danger); }
+.photo-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.photo-row small { color: var(--muted); }
+.att-grid.work-grid { min-width: 0; }
+.att-grid.work-grid thead th { padding: 8px 6px; min-width: 42px; white-space: nowrap; font-size: 12px; line-height: 1.25; }
+.att-grid.work-grid thead th small { display: block; font-weight: 600; opacity: .85; font-size: 10.5px; }
+.att-grid.work-grid thead th.att-name { text-align: left; padding-left: 12px; }
+.att-grid.work-grid td { padding: 8px 6px; font-weight: 600; }
+.att-grid.work-grid td.att-name { text-align: left; }
+.att-grid.work-grid td.w-amt { background: #e6f5f1; color: var(--ok); font-weight: 800; }
+.att-grid.work-grid tfoot td { background: #eef4ff; color: var(--navy); font-weight: 800; padding: 9px 6px; }
+.work-total { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; padding: 14px 18px; border-radius: 12px; background: linear-gradient(135deg, var(--navy), var(--navy-2)); color: #fff; }
+.work-total .k { font-weight: 600; }
+.work-total .k small { display: block; opacity: .75; font-weight: 500; margin-top: 2px; }
+.work-total .v { font-size: 26px; font-weight: 800; color: var(--accent); }
+.modal-scroll { align-items: flex-start; overflow-y: auto; }
+.modal-scroll .modal { margin: auto; max-height: none; }
+.modal-body .full { grid-column: 1 / -1; }
+.photo-viewer { display: none; position: fixed; inset: 0; z-index: 120; background: rgba(8, 20, 36, 0.9); align-items: center; justify-content: center; padding: 20px; }
+.photo-viewer.open { display: flex; }
+.photo-viewer img { max-width: 100%; max-height: calc(100vh - 40px); border-radius: 10px; }
+.photo-viewer button { position: absolute; width: 42px; height: 42px; padding: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: #fff; font-size: 26px; line-height: 1; }
+.photo-viewer button:hover { background: rgba(255, 255, 255, 0.32); }
+.pv-x { top: 16px; right: 16px; }
+.pv-prev { left: 16px; top: 50%; transform: translateY(-50%); }
+.pv-next { right: 16px; top: 50%; transform: translateY(-50%); }
+
+/* attendance cells that belong to a work */
+.att-grid td.att-locked { background: #fff4d6; }
+.att-grid td.att-locked input { cursor: not-allowed; color: var(--navy); font-weight: 700; }
+.att-grid.work-grid td input { min-width: 42px; }
+.info-msg { line-height: 1.65; color: var(--text); }
+.info-msg b { color: var(--navy); }
+
+/* work list: search, pager */
+.work-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.work-tools .search-wrap { width: 300px; max-width: 100%; }
+.work-pager { background: #fff; border-radius: 12px; padding: 12px 16px; box-shadow: var(--shadow); margin: 0 0 16px; }
+.work-pager:empty { display: none; }
+.pager-ic { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; }
+.pager-ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; display: block; }
+.report-tools { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+/* work order + busy employees */
+.work-tools select { width: auto; min-width: 170px; }
+.picker-busy { padding: 9px 12px; font-size: 14px; color: #94a3b8; background: #f8fafc; cursor: not-allowed; }
+.picker-busy small { display: block; margin-top: 1px; font-size: 12px; color: #b45309; }
+#infoModal { z-index: 95; }
+
+/* ALL REPORT */
+.rpt-bar { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.rpt-bar .att-month { margin: 0; }
+.report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.report-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: var(--shadow); border: 1px solid #edf0f4; display: flex; flex-direction: column; gap: 10px; }
+.report-card h4 { margin: 0; font-size: 16px; }
+.report-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; flex: 1; }
+.report-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; }
+.report-tag { background: #e8eef8; color: var(--navy-2); font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.report-count { color: var(--muted); font-weight: 600; }
+.report-card { border-top: 3px solid var(--navy); transition: transform .15s, box-shadow .15s; }
+.report-card:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(15, 39, 68, 0.14); }
+.report-card .btn-dl { background: var(--navy); color: #fff; padding: 11px 14px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.report-card .btn-dl:hover { background: var(--navy-2); }
+.report-card .btn-dl svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 980px) {
+  .report-grid { grid-template-columns: 1fr; }
+  .modal-body { grid-template-columns: 1fr; }
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; }
+  .form-grid, .g-labour, .g-wage, .g-week, .g-month, .g-month-2, .g-att, .g-profile, .g-task, .stats {
+    grid-template-columns: 1fr;
+  }
+  .g-task .span2, .g-task .span3 { grid-column: auto; }
+  .stats.stats-3 { grid-template-columns: 1fr; }
+  .big-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body class="booting">
+
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-brand">Prathamesh Infra Con</div>
+    <h2>Site Operations Manager</h2>
+    <p>Sign in to continue to your workspace.</p>
+    <label for="username">Username</label>
+    <input id="username" placeholder="Enter username">
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Enter password" onkeydown="if (event.key === 'Enter') doLogin()">
+    <button class="btn-primary" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo">
+        <span>Prathamesh Infra Con</span>
+      </div>
+      <div class="nav-label">Modules</div>
+      <button class="nav-btn active" onclick="showSection('dashboardSection', this)">Dashboard</button>
+      <button class="nav-btn" onclick="showSection('labourSection', this)">Employee</button>
+      <button class="nav-btn" onclick="showSection('attendanceSection', this)">Attendance</button>
+      <button class="nav-btn" onclick="showSection('taskSection', this)">Work and Task</button>
+      <button class="nav-btn" onclick="showSection('advanceSection', this)">Advance payment</button>
+      <button class="nav-btn" onclick="showSection('weeklySection', this)">Weekly Expenditure</button>
+      <button class="nav-btn" onclick="showSection('monthlySection', this)">Monthly Expenditure</button>
+      <button class="nav-btn" onclick="showSection('reportSection', this)">All Report</button>
+    </aside>
+
+    <div class="main">
+      <div class="header">
+        <div>
+          <div class="title" id="pageTitle">Dashboard</div>
+          <div class="subtitle" id="pageSubtitle">Overview of site operations</div>
+        </div>
+        <div class="profile">
+          <div class="profile-link" role="button" tabindex="0" title="My profile" onclick="openProfile()" onkeydown="if (event.key === 'Enter') openProfile()">
+            <img id="hdrAvatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" onerror="this.onerror=null;this.src=FALLBACK_AVATAR">
+            <div>
+              <div class="who" id="hdrName">faiz</div>
+              <div class="role" id="hdrRole">Admin user</div>
+            </div>
+          </div>
+          <button class="logout" onclick="logout()">Logout</button>
+        </div>
+      </div>
+
+      <div class="ro-note" id="roNote">You have read-only access. You can view records, but you cannot add, edit or delete them.</div>
+
+      <div id="profileSection" class="section">
+        <div class="card profile-hero">
+          <div class="avatar-block">
+            <img id="pfAvatar" class="avatar-lg" alt="Profile picture" onerror="this.onerror=null;this.src=FALLBACK_AVATAR">
+            <div class="avatar-actions">
+              <button class="btn-clear" onclick="pfPhotoInput.click()">Change photo</button>
+              <button class="btn-clear" onclick="removeProfilePhoto()">Remove</button>
+            </div>
+            <input type="file" id="pfPhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+          </div>
+          <div class="hero-info">
+            <h3 id="pfHeadName"></h3>
+            <div class="muted" id="pfHeadUser"></div>
+            <span class="badge" id="pfRoleBadge"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Profile details</h4>
+          <div class="form-grid g-profile">
+            <div class="field">
+              <label>Full name</label>
+              <input id="pfName" placeholder="Your name" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input id="pfEmail" type="email" placeholder="name@example.com" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>Phone</label>
+              <input id="pfPhone" placeholder="Phone number" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>Username</label>
+              <input id="pfUsername" class="readonly" readonly>
+            </div>
+            <div class="field">
+              <label>Access level</label>
+              <input id="pfAccess" class="readonly" readonly>
+            </div>
+          </div>
+          <div class="form-actions-row">
+            <button class="btn-primary" onclick="saveProfileDetails()">Save changes</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Change password</h4>
+          <div class="form-grid g-profile">
+            <div class="field">
+              <label>Current password</label>
+              <input id="pfCurPass" type="password" autocomplete="current-password">
+            </div>
+            <div class="field">
+              <label>New password</label>
+              <input id="pfNewPass" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+            </div>
+            <div class="field">
+              <label>Confirm new password</label>
+              <input id="pfNewPass2" type="password" autocomplete="new-password">
+            </div>
+          </div>
+          <div class="form-actions-row">
+            <button class="btn-primary" onclick="changePassword()">Update password</button>
+          </div>
+        </div>
+
+        <div id="manageProfiles"></div>
+      </div>
+
+      <div id="dashboardSection" class="section">
+        <div class="stats stats-3 stats-navy">
+          <div class="stat"><div class="k">Employees on record</div><div class="v" id="statLabour">0</div></div>
+          <div class="stat"><div class="k">Total expenditure this month</div><div class="v" id="statExpenditureMonth">0</div></div>
+          <div class="stat"><div class="k">Total advance this month</div><div class="v" id="statAdvanceMonth">0</div></div>
+        </div>
+        <div class="card">
+          <h4>Live Projects</h4>
+          <div class="slider">
+            <img id="slideImage" src="images_1.jpg" alt="Site photo">
+          </div>
+          <div class="slide-dots" id="slideDots"></div>
+        </div>
+        <div class="card">
+          <h4>Completed Projects</h4>
+          <div class="slider">
+            <img id="completedSlideImage" src="images_2.jpg" alt="Completed project photo">
+          </div>
+          <div class="slide-dots" id="completedSlideDots"></div>
+        </div>
+      </div>
+
+      <div id="labourSection" class="section">
+        <div class="stats stats-navy">
+          <div class="stat"><div class="k">Total labours</div><div class="v" id="empStatLabour">0</div></div>
+          <div class="stat"><div class="k">Engineers</div><div class="v" id="empStatEngineer">0</div></div>
+          <div class="stat"><div class="k">Foreman</div><div class="v" id="empStatExtra">0</div></div>
+          <div class="stat"><div class="k">Total resources</div><div class="v" id="empStatTotal">0</div></div>
+        </div>
+        <div class="page-head" style="justify-content:flex-end">
+          <div class="head-btns">
+            <button class="btn-clear keep" onclick="downloadEmployeesExcel()">Download Excel</button>
+            <button class="btn-primary" id="addEmployeeBtn" onclick="openEmployeeForm()">+ Add new Employee</button>
+          </div>
+        </div>
+
+        <div class="modal-backdrop" id="employeeModal">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="employeeFormTitle">
+            <div class="modal-head">
+              <h4 id="employeeFormTitle">Add Employee</h4>
+              <button type="button" class="modal-x" title="Close" onclick="closeEmployeeForm()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="field">
+                <label>Employee ID</label>
+                <input id="lid" class="readonly" readonly>
+              </div>
+              <div class="field">
+                <label>Full name</label>
+                <input id="lname" placeholder="Enter name" maxlength="60" oninput="this.value = this.value.replace(/[^A-Za-z0-9 ]/g, '')">
+              </div>
+              <div class="field">
+                <label>Profession</label>
+                <div class="picker picker-select" id="profPicker" onmouseenter="profPickOpen()" onmouseleave="profPickLeave()">
+                  <input id="lprofession" readonly autocomplete="off" placeholder="Select profession" maxlength="40"
+                         onfocus="profPickOpen()" onclick="profPickOpen()" onkeydown="profPickKey(event)">
+                  <div class="picker-list" id="profPickList" onmousedown="profPickPress(event)">
+                    <div class="picker-item" data-v="Engineer">Engineer</div>
+                    <div class="picker-item" data-v="Foreman">Foreman</div>
+                    <div class="picker-item has-sub" data-v="Labour">Labour<span class="chev">&rsaquo;</span>
+                      <div class="sub-menu">
+                        <div class="picker-item" data-v="Plumber">Plumber</div>
+                        <div class="picker-item" data-v="Electrician">Electrician</div>
+                        <div class="picker-item" data-v="Helper">Helper</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Rate</label>
+                <input id="lrate" placeholder="Daily rate" inputmode="decimal" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1')">
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn-clear" onclick="closeEmployeeForm()">Cancel</button>
+              <button class="btn-primary" id="labourSaveBtn" onclick="addLabour()">Save employee</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="att-toolbar">
+            <div class="att-month">
+              <label for="empMonth">Current month</label>
+              <input type="month" id="empMonth" onchange="empPage = 1; renderLabours()">
+            </div>
+            <div class="att-actions">
+              <div class="search-wrap">
+                <input class="emp-search" id="empSearch" placeholder="Search by name, ID or profession" oninput="empPage = 1; renderLabours()">
+                <button type="button" class="search-x" title="Clear search" onclick="empSearch.value = ''; empPage = 1; renderLabours(); empSearch.focus()">&times;</button>
+              </div>
+            </div>
+          </div>
+          <div class="att-wrap">
+            <table class="att-grid emp-grid">
+              <thead id="empHead"></thead>
+              <tbody id="labourTable"></tbody>
+            </table>
+          </div>
+          <div class="pager" id="empPager"></div>
+        </div>
+      </div>
+
+      <div id="attendanceSection" class="section">
+        <div class="card">
+          <div class="att-toolbar">
+            <div class="att-month">
+              <label for="attendanceMonth">Current month</label>
+              <input type="month" id="attendanceMonth" onchange="attPage = 1; renderAttendance()">
+            </div>
+            <div class="att-actions">
+              <div class="search-wrap">
+                <input class="emp-search" id="attSearch" placeholder="Search employee name" oninput="attPage = 1; renderAttendance()">
+                <button type="button" class="search-x" title="Clear search" onclick="attSearch.value = ''; attPage = 1; renderAttendance(); attSearch.focus()">&times;</button>
+              </div>
+              <button class="btn-clear keep" onclick="downloadAttendanceExcel()">Download Excel</button>
+            </div>
+          </div>
+          <div class="att-wrap">
+            <table class="att-grid" id="attGrid">
+              <thead id="attHead"></thead>
+              <tbody id="attendanceTable"></tbody>
+            </table>
+          </div>
+          <div class="pager" id="attPager"></div>
+          <div style="margin-top:14px">
+            <button class="btn-primary" onclick="saveAttendance()">Save attendance</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="taskSection" class="section">
+        <div class="card">
+          <div class="work-toolbar">
+            <div class="work-tabs">
+              <button class="work-tab active" id="wtab_new" onclick="setTaskTab('new')">New work <span id="wcnt_new">0</span></button>
+              <button class="work-tab" id="wtab_prog" onclick="setTaskTab('prog')">Work in progress <span id="wcnt_prog">0</span></button>
+              <button class="work-tab" id="wtab_done" onclick="setTaskTab('done')">Work completed <span id="wcnt_done">0</span></button>
+            </div>
+            <div class="work-tools">
+              <select id="taskSort" title="Which works to show first" onchange="taskSortChanged()">
+                <option value="new">Latest added first</option>
+                <option value="old">Oldest added first</option>
+              </select>
+              <div class="search-wrap">
+                <input class="emp-search" id="taskSearch" placeholder="Search work, location or employee" oninput="taskPage = 1; renderTasks()">
+                <button type="button" class="search-x" title="Clear search" onclick="taskSearch.value = ''; taskPage = 1; renderTasks(); taskSearch.focus()">&times;</button>
+              </div>
+              <button class="btn-primary" onclick="openTaskForm()">+ Add new work</button>
+            </div>
+          </div>
+          <div class="work-hint">Attendance for each date is taken from the Attendance module. Amount = total days &times; employee rate.</div>
+        </div>
+
+        <div id="taskCards"></div>
+        <div class="pager work-pager" id="taskPager"></div>
+
+        <div class="modal-backdrop modal-scroll" id="taskModal">
+          <div class="modal" style="max-width:680px" role="dialog" aria-modal="true" aria-labelledby="taskFormTitle">
+            <div class="modal-head">
+              <h4 id="taskFormTitle">Add new work</h4>
+              <button type="button" class="modal-x" title="Close" onclick="closeTaskForm()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="field full">
+                <label>Task description</label>
+                <input id="taskDesc" placeholder="e.g. Wall building" maxlength="100" oninput="this.value = this.value.replace(/[^A-Za-z0-9 ]/g, '')">
+              </div>
+              <div class="field">
+                <label>Location</label>
+                <input id="taskLocation" placeholder="e.g. Tower 2" maxlength="60" oninput="this.value = this.value.replace(/[^A-Za-z0-9 ]/g, '')">
+              </div>
+              <div class="field">
+                <label>Type of work</label>
+                <select id="taskStatus">
+                  <option value="To be started">New work</option>
+                  <option value="In progress">Work in progress</option>
+                  <option value="Completed">Work completed</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Start date</label>
+                <input type="date" id="taskStart" onchange="syncTaskDates()">
+              </div>
+              <div class="field">
+                <label>End date</label>
+                <input type="date" id="taskEnd">
+              </div>
+              <div class="field full">
+                <label>Employees (search and add one or more)</label>
+                <div class="picker" id="taskPicker">
+                  <input id="taskPickInput" placeholder="Search employee" autocomplete="off"
+                         onfocus="taskPickOpen()" oninput="taskPickOpen(true)" onkeydown="taskPickKey(event)">
+                  <button type="button" class="picker-x" title="Close" onclick="taskPickClose(); taskPickInput.blur()">&times;</button>
+                  <div class="picker-list" id="taskPickList"></div>
+                </div>
+                <div class="chips" id="taskChips"></div>
+              </div>
+              <div class="field full">
+                <label>Work photos</label>
+                <div class="photo-row">
+                  <button type="button" class="btn-clear" onclick="taskPhotoInput.click()">Upload photos</button>
+                  <small id="taskPhotoHint">No photos added</small>
+                </div>
+                <input type="file" id="taskPhotoInput" accept="image/*" multiple hidden onchange="addTaskPhotos(this)">
+                <div class="photo-grid" id="taskPhotoGrid"></div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button type="button" class="btn-clear" onclick="closeTaskForm()">Cancel</button>
+              <button type="button" class="btn-primary" id="taskSaveBtn" onclick="saveTask()">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="report-bar">
+            <h4 style="margin:0">Daily report</h4>
+            <div class="report-tools">
+              <div class="field">
+                <label for="taskReportDate">Date</label>
+                <input type="date" id="taskReportDate" onchange="taskReportPage = 1; renderTasks()">
+              </div>
+              <button class="btn-primary keep" onclick="downloadDailyReport()">Download Excel</button>
+            </div>
+          </div>
+          <div class="report-sum" id="taskReportSum" style="margin-bottom:12px"></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Task</th><th>Location</th><th>Employees</th><th>Days taken</th><th>Status</th></tr>
+              </thead>
+              <tbody id="taskReportTable"></tbody>
+            </table>
+          </div>
+          <div class="pager" id="taskReportPager"></div>
+        </div>
+      </div>
+
+      <div id="advanceSection" class="section">
+        <div class="big-row">
+          <div class="big-total">
+            <div class="k">Total advance paid this month<small id="advTotalMonth"></small></div>
+            <div class="v" id="advTotalValue">0</div>
+          </div>
+          <div class="big-total">
+            <div class="k">Advance paid in previous month<small id="advPrevMonth"></small></div>
+            <div class="v" id="advPrevValue">0</div>
+          </div>
+        </div>
+        <div class="card">
+          <h4 id="advFormTitle">Add advance payment</h4>
+          <div class="form-grid g-wage">
+            <div class="field">
+              <label>Employee name</label>
+              <div class="picker" id="advPicker">
+                <input id="advPickInput" placeholder="Search employee" autocomplete="off"
+                       onfocus="advPickOpen()" oninput="advPickOpen(true)" onkeydown="advPickKey(event)">
+                <button type="button" class="picker-x" title="Clear" onclick="advPickClear()">&times;</button>
+                <div class="picker-list" id="advPickList"></div>
+                <select id="advLabour" onchange="fillAdvanceLabour()" style="display:none"></select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Rate</label>
+              <input id="advRate" class="readonly" readonly>
+            </div>
+            <div class="field">
+              <label>Amount</label>
+              <input id="advAmount" placeholder="Enter amount" inputmode="decimal" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1')">
+            </div>
+            <div class="field">
+              <label>Paid by</label>
+              <input id="advPaidBy" placeholder="Enter name" maxlength="40" oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')">
+            </div>
+            <div class="field">
+              <label>Mode</label>
+              <select id="advMode">
+                <option value="">Select</option>
+                <option>Online</option>
+                <option>Cash</option>
+              </select>
+            </div>
+            <div class="field">
+              <div class="form-actions">
+                <button class="btn-primary" id="advSaveBtn" onclick="saveAdvance()">Save</button>
+                <button class="btn-clear" onclick="clearAdvance()">Clear</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="emp-head">
+            <h4>Saved advance payments</h4>
+            <button class="btn-clear keep" onclick="downloadAdvancesExcel()">Download Excel</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Date</th><th>Name</th><th>Rate</th><th>Amount</th><th>Paid by</th><th>Mode</th><th>Action</th></tr>
+              </thead>
+              <tbody id="advanceTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="weeklySection" class="section">
+        <div class="stats stats-3 stats-navy">
+          <div class="stat"><div class="k">Employees paid</div><div class="v" id="wkStatPaid">0</div></div>
+          <div class="stat"><div class="k">Employees pending</div><div class="v" id="wkStatPending">0</div></div>
+          <div class="stat"><div class="k">This month total kharchi</div><div class="v" id="wkStatGiven">0</div></div>
+        </div>
+        <div class="card">
+          <div class="att-toolbar">
+            <div class="att-month">
+              <label for="weekMonth">Current month</label>
+              <input type="month" id="weekMonth" onchange="wkPage = 1; renderWeekly()">
+            </div>
+            <div class="att-actions">
+              <div class="search-wrap">
+                <input class="emp-search" id="weekSearch" placeholder="Search employee name" oninput="wkPage = 1; renderWeekly()">
+                <button type="button" class="search-x" title="Clear search" onclick="weekSearch.value = ''; wkPage = 1; renderWeekly(); weekSearch.focus()">&times;</button>
+              </div>
+              <button class="btn-clear keep" onclick="downloadWeeklyExcel()">Download Excel</button>
+            </div>
+          </div>
+          <div class="att-wrap">
+            <table class="att-grid wk-grid">
+              <thead id="weekHead"></thead>
+              <tbody id="weeklyTable"></tbody>
+            </table>
+          </div>
+          <div class="pager" id="weekPager"></div>
+          <div style="margin-top:14px">
+            <button class="btn-primary" onclick="saveWeekly()">Save weekly expenditure</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="monthlySection" class="section">
+        <div class="stats stats-3 stats-navy">
+          <div class="stat"><div class="k">Employees paid</div><div class="v" id="monStatPaid">0</div></div>
+          <div class="stat"><div class="k">Employees pending</div><div class="v" id="monStatPending">0</div></div>
+          <div class="stat"><div class="k">Amount paid this month</div><div class="v" id="monStatAmount">0</div></div>
+        </div>
+        <div class="page-head">
+          <div>
+            <h2>Monthly Expenditure</h2>
+            <div class="muted">Days worked are taken from attendance for the selected month.</div>
+          </div>
+          <div class="month-date-wrap">
+            <label for="monthDate">Month date</label>
+            <input type="date" id="monthDate" onchange="fillMonthlyDays()">
+          </div>
+        </div>
+        <div class="card">
+          <h4>Add monthly expenditure</h4>
+          <div class="form-grid g-month">
+            <div class="field">
+              <label>Employee name</label>
+              <div class="picker" id="monthPicker">
+                <input id="monthPickInput" placeholder="Search employee" autocomplete="off"
+                       onfocus="monthPicker.open()" oninput="monthPicker.open(true)" onkeydown="monthPicker.key(event)">
+                <button type="button" class="picker-x" title="Clear" onclick="monthPicker.clear()">&times;</button>
+                <div class="picker-list" id="monthPickList"></div>
+                <select id="monthLabour" onchange="fillMonthlyLabour()" style="display:none"></select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Rate</label>
+              <input id="monthRate" class="readonly" readonly>
+            </div>
+            <div class="field">
+              <label>Days worked</label>
+              <input id="monthDays" class="readonly" readonly placeholder="Select date">
+            </div>
+            <div class="field">
+              <div class="form-actions">
+                <button class="btn-primary keep" onclick="calcMonthly()">Calculate</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-grid g-month-2" style="margin-top:14px">
+            <div class="field">
+              <label>Total amount</label>
+              <input id="monthTotal" class="readonly total-box" readonly>
+            </div>
+            <div class="field">
+              <label>Weekly amount paid</label>
+              <input id="monthWeeklyPaid" class="readonly" readonly>
+            </div>
+            <div class="field">
+              <label>Grand total</label>
+              <input id="monthGrand" class="readonly total-box" readonly>
+            </div>
+            <div class="field">
+              <label>Advance paid</label>
+              <input id="monthAdvance" class="readonly" readonly>
+            </div>
+            <div class="field">
+              <label>Amount to be paid</label>
+              <input id="monthPayable" class="readonly total-box" readonly>
+            </div>
+            <div class="field">
+              <div class="form-actions">
+                <button class="btn-primary" onclick="saveMonthly()">Save</button>
+                <button class="btn-clear" onclick="clearMonthly()">Clear</button>
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap" style="margin-top:16px">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Month</th>
+                  <th>Rate</th>
+                  <th>Days</th>
+                  <th>Total</th>
+                  <th>Weekly paid</th>
+                  <th>Grand total</th>
+                  <th>Advance paid</th>
+                  <th>Amount to be paid</th>
+                </tr>
+              </thead>
+              <tbody id="monthlyTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="reportSection" class="section">
+        <div class="card">
+          <div class="rpt-bar">
+            <div class="att-month">
+              <label for="reportMonth">Report month</label>
+              <input type="month" id="reportMonth" onchange="updateReportCounts()">
+              <div class="muted" style="margin-top:6px">Applies to the month-wise reports (Employee, Attendance, Weekly).</div>
+            </div>
+            <button class="btn-primary keep" onclick="downloadAllReportsExcel()">Download all reports (one Excel file)</button>
+          </div>
+        </div>
+
+        <div class="report-grid">
+          <div class="report-card">
+            <h4>Employee Report</h4>
+            <p>Month sheet for every employee: daily attendance, rate, wages, weekly kharchi, advance and grand total.</p>
+            <div class="report-meta"><span class="report-tag">Selected month</span><span class="report-count" id="rpCountEmp">-</span></div>
+            <button class="btn-dl keep" onclick="downloadEmployeesReport()"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download Excel</button>
+          </div>
+          <div class="report-card">
+            <h4>Attendance Report</h4>
+            <p>Day-by-day attendance of all employees with the monthly total.</p>
+            <div class="report-meta"><span class="report-tag">Selected month</span><span class="report-count" id="rpCountAtt">-</span></div>
+            <button class="btn-dl keep" onclick="downloadAttendanceReport()"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download Excel</button>
+          </div>
+          <div class="report-card">
+            <h4>Work and Task Report</h4>
+            <p>All saved tasks with location, employees assigned, dates, days taken and status.</p>
+            <div class="report-meta"><span class="report-tag">All records</span><span class="report-count" id="rpCountTask">-</span></div>
+            <button class="btn-dl keep" onclick="downloadTasksReport()"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download Excel</button>
+          </div>
+          <div class="report-card">
+            <h4>Advance Payment Report</h4>
+            <p>Every advance payment with date, employee, amount, paid by and mode, with a total.</p>
+            <div class="report-meta"><span class="report-tag">All records</span><span class="report-count" id="rpCountAdv">-</span></div>
+            <button class="btn-dl keep" onclick="downloadAdvancesReport()"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download Excel</button>
+          </div>
+          <div class="report-card">
+            <h4>Weekly Expenditure Report</h4>
+            <p>Sunday-wise kharchi given to each employee, with column and grand totals.</p>
+            <div class="report-meta"><span class="report-tag">Selected month</span><span class="report-count" id="rpCountWk">-</span></div>
+            <button class="btn-dl keep" onclick="downloadWeeklyReport()"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download Excel</button>
+          </div>
+          <div class="report-card">
+            <h4>Monthly Expenditure Report</h4>
+            <p>Saved monthly settlements: days, total, weekly paid, advance and amount to be paid.</p>
+            <div class="report-meta"><span class="report-tag">All records</span><span class="report-count" id="rpCountMon">-</span></div>
+            <button class="btn-dl keep" onclick="downloadMonthlyReport()"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="infoModal" onclick="if (event.target === this) closeInfo()">
+  <div class="modal" style="max-width:480px" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="modal-head">
+      <h4 id="infoTitle">Notice</h4>
+      <button type="button" class="modal-x" title="Close" onclick="closeInfo()">&times;</button>
+    </div>
+    <div class="modal-body" style="display:block"><div class="info-msg" id="infoBody"></div></div>
+    <div class="modal-foot">
+      <button type="button" class="btn-clear keep" onclick="closeInfo()">OK, got it</button>
+      <button type="button" class="btn-primary keep" id="infoGo" style="display:none">Open this work</button>
+    </div>
+  </div>
+</div>
+
+<div class="photo-viewer" id="photoViewer" onclick="if (event.target === this) closePhotoViewer()">
+  <button type="button" class="pv-x" title="Close" onclick="closePhotoViewer()">&times;</button>
+  <button type="button" class="pv-prev" id="pvPrev" title="Previous" onclick="stepPhoto(-1)">&lsaquo;</button>
+  <img id="pvImg" alt="Work photo">
+  <button type="button" class="pv-next" id="pvNext" title="Next" onclick="stepPhoto(1)">&rsaquo;</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const titles = {
+  dashboardSection: ['Dashboard', 'Overview of site operations'],
+  profileSection: ['My Profile', 'Your account details and access'],
+  labourSection: ['Employee Management', ''],
+  attendanceSection: ['Monthly Attendance', 'Enter attendance for the whole month'],
+  taskSection: ['Work and Task', 'Assign work to employees and track the daily report'],
+  advanceSection: ['Advance payment', 'Record advance payments against an employee'],
+  weeklySection: ['Weekly Expenditure', 'Record weekly amounts paid to employees'],
+  monthlySection: ['Monthly Expenditure', 'Settle monthly wages from attendance'],
+  reportSection: ['All Report', 'Download every module as an Excel file']
+};
+
+// ---- Server storage (SQLite via server.js) ----
+let me = null;                 // the signed-in user, set after login
+let sessionAlertShown = false;
+let saveFailedShown = false;
+const DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+const FALLBACK_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#e2e8f0"/><circle cx="32" cy="24" r="11" fill="#94a3b8"/><path d="M10 60c2-14 12-20 22-20s20 6 22 20z" fill="#94a3b8"/></svg>'
+);
+
+function escHtml(v) {
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function api(method, url, body) {
+  const opts = { method, headers: {} };
+  if (body !== undefined) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  let r;
+  try {
+    r = await fetch(url, opts);
+  } catch (e) {
+    throw new Error('Cannot reach the server. Start it with: node server.js, then open http://localhost:3000');
+  }
+  let data = {};
+  try { data = await r.json(); } catch (e) {}
+  if (r.status === 401 && url !== '/api/login') {
+    sessionExpired();
+    throw new Error('Session expired');
+  }
+  if (!r.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function sessionExpired() {
+  if (sessionAlertShown) return;
+  sessionAlertShown = true;
+  alert('Your session has expired. Please sign in again.');
+  showLogin();
+}
+
+function save(key, value) {
+  fetch('/api/data/' + key, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(value)
+  }).then(r => {
+    if (r.status === 401) return sessionExpired();
+    if (r.status === 403) return alert('You have read-only access, so this change was not saved.');
+    if (!r.ok) throw new Error('save failed');
+  }).catch(() => {
+    if (!saveFailedShown) {
+      saveFailedShown = true;
+      alert('Could not save to the database. Make sure the server is running (node server.js).');
+    }
+  });
+}
+
+let labours = [];
+let attendance = [];
+let advances = [];
+let tasks = [];
+let weeklyPays = [];
+let monthlyPays = [];
+let editingLabourId = null;
+let empPage = 1;
+const EMP_PER_PAGE = 10;
+
+function nextLabourId() {
+  const nums = labours.map(l => parseInt(String(l.id).replace(/\D/g, ''), 10) || 0);
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return 'PILB-' + String(next).padStart(3, '0');
+}
+
+function previewNextId() {
+  lid.value = editingLabourId || nextLabourId();
+}
+
+function notify(msg) {
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 1800);
+}
+
+async function doLogin() {
+  const u = username.value.trim();
+  if (!u || !password.value) return alert('Please enter username and password');
+  try {
+    const d = await api('POST', '/api/login', { username: u, password: password.value });
+    password.value = '';
+    await enterApp(d.user);
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function enterApp(user) {
+  me = user;
+  sessionAlertShown = false;
+  try {
+    const d = await api('GET', '/api/data');
+    labours = d.labours || [];
+    attendance = d.attendance || [];
+    advances = d.advances || [];
+    tasks = d.tasks || [];
+    weeklyPays = d.weeklyPays || [];
+    monthlyPays = d.monthlyPays || [];
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+    return;
+  }
+  loginPage.style.display = 'none';
+  dashboard.style.display = 'block';
+  applyUser();
+  showSection('dashboardSection', document.querySelector('.nav-btn'));
+  renderLabours();
+  fillWageDropdowns();
+  renderAdvances();
+  renderWeekly();
+  renderMonthly();
+  previewNextId();
+  startSlider();
+  setTimeout(startCompletedSlider, 1500);
+  updateStats();
+}
+
+function showLogin() {
+  dashboard.style.display = 'none';
+  loginPage.style.display = 'flex';
+  document.body.classList.remove('ro');
+  me = null;
+}
+
+async function logout() {
+  try { await fetch('/api/logout', { method: 'POST' }); } catch (e) {}
+  showLogin();
+  username.value = '';
+  password.value = '';
+}
+
+// ---- profile ----
+function roleLabel(u) {
+  return u.role === 'readonly' ? 'Read-only user' : 'Admin user';
+}
+
+function applyUser() {
+  hdrAvatar.src = me.photo || DEFAULT_AVATAR;
+  hdrName.textContent = me.name;
+  hdrRole.textContent = roleLabel(me);
+  document.body.classList.toggle('ro', me.role === 'readonly');
+  roNote.style.display = me.role === 'readonly' ? 'block' : 'none';
+}
+
+function openProfile() {
+  showSection('profileSection', null);
+}
+
+function fillProfilePage() {
+  pfAvatar.src = me.photo || DEFAULT_AVATAR;
+  pfHeadName.textContent = me.name;
+  pfHeadUser.textContent = '@' + me.username;
+  pfRoleBadge.textContent = roleLabel(me);
+  pfName.value = me.name;
+  pfEmail.value = me.email || '';
+  pfPhone.value = me.phone || '';
+  pfUsername.value = me.username;
+  pfAccess.value = roleLabel(me);
+  pfCurPass.value = '';
+  pfNewPass.value = '';
+  pfNewPass2.value = '';
+  renderManageProfiles();
+}
+
+async function saveProfileDetails() {
+  const name = pfName.value.trim();
+  if (!name) return alert('Please enter your name');
+  try {
+    const d = await api('PUT', '/api/me', { name, email: pfEmail.value.trim(), phone: pfPhone.value.trim() });
+    me = d.user;
+    applyUser();
+    fillProfilePage();
+    notify('Profile updated');
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+  }
+}
+
+function uploadProfilePhoto(input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return alert('Please choose an image file');
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = async () => {
+    const size = 256;
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const side = Math.min(img.width, img.height);
+    c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+    URL.revokeObjectURL(url);
+    try {
+      const d = await api('PUT', '/api/me', { photo: c.toDataURL('image/jpeg', 0.85) });
+      me = d.user;
+      applyUser();
+      fillProfilePage();
+      notify('Profile picture updated');
+    } catch (e) {
+      if (e.message !== 'Session expired') alert(e.message);
+    }
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alert('Could not read that image'); };
+  img.src = url;
+}
+
+async function removeProfilePhoto() {
+  if (!me.photo) return;
+  try {
+    const d = await api('PUT', '/api/me', { photo: '' });
+    me = d.user;
+    applyUser();
+    fillProfilePage();
+    notify('Profile picture removed');
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+  }
+}
+
+async function changePassword() {
+  const cur = pfCurPass.value;
+  const next = pfNewPass.value;
+  if (!cur) return alert('Please enter your current password');
+  if (next.length < 6) return alert('New password must be at least 6 characters');
+  if (next !== pfNewPass2.value) return alert('New password and confirmation do not match');
+  try {
+    await api('PUT', '/api/me/password', { current: cur, next });
+    pfCurPass.value = '';
+    pfNewPass.value = '';
+    pfNewPass2.value = '';
+    notify('Password updated');
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+  }
+}
+
+// Manage profiles: built only for the primary admin (faiz); the server enforces this too
+async function renderManageProfiles() {
+  const box = document.getElementById('manageProfiles');
+  if (!me || !me.isOwner) {
+    box.innerHTML = '';
+    return;
+  }
+  let users = [];
+  try {
+    users = (await api('GET', '/api/users')).users;
+  } catch (e) {
+    box.innerHTML = '';
+    return;
+  }
+  const rows = users.map(u => `
+    <tr>
+      <td><span class="badge">${escHtml(u.username)}</span></td>
+      <td>${escHtml(u.name || '')}</td>
+      <td>${u.role === 'readonly' ? 'Read-only user' : 'Admin user'}</td>
+      <td>${escHtml((u.created_at || '').slice(0, 10))}</td>
+      <td>${u.username === me.username ? '<span style="color:var(--muted)">-</span>' : `
+        <div class="actions">
+          <button class="btn-edit" data-u="${escHtml(u.username)}" data-r="${escHtml(u.role)}" onclick="openEditProfile(this.dataset.u, this.dataset.r)">Update</button>
+          <button class="btn-delete" data-u="${escHtml(u.username)}" onclick="deleteProfile(this.dataset.u)">Delete</button>
+        </div>`}</td>
+    </tr>`).join('');
+  box.innerHTML = `
+    <div class="card">
+      <div class="emp-head">
+        <h4>Manage profiles</h4>
+        <button class="btn-primary" id="addProfileBtn" onclick="openAddProfile()">+ Add new profile</button>
+      </div>
+      <div id="newProfileForm" style="display:none; margin-bottom:18px">
+        <div class="form-grid g-profile">
+          <div class="field">
+            <label>Username</label>
+            <input id="npUsername" placeholder="Choose a username" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Create password</label>
+            <input id="npPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+          </div>
+          <div class="field">
+            <label>Access level</label>
+            <select id="npRole">
+              <option value="">Select access level</option>
+              <option value="readonly">Read-only user</option>
+              <option value="admin">Admin user</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions-row">
+          <button class="btn-primary" onclick="createProfile()">Create profile</button>
+          <button class="btn-clear" onclick="closeAddProfile()">Cancel</button>
+        </div>
+      </div>
+      <div id="editProfileForm" style="display:none; margin-bottom:18px">
+        <h4 id="epTitle" style="margin:0 0 10px"></h4>
+        <div class="form-grid g-profile">
+          <div class="field">
+            <label>Access level</label>
+            <select id="epRole">
+              <option value="readonly">Read-only user</option>
+              <option value="admin">Admin user</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>New password (leave blank to keep current)</label>
+            <input id="epPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+          </div>
+        </div>
+        <div class="form-actions-row">
+          <button class="btn-primary" onclick="saveProfileUpdate()">Save changes</button>
+          <button class="btn-clear" onclick="closeEditProfile()">Cancel</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Username</th><th>Name</th><th>Access level</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function openAddProfile() {
+  if (document.getElementById('editProfileForm')) closeEditProfile();
+  document.getElementById('npUsername').value = '';
+  document.getElementById('npPassword').value = '';
+  document.getElementById('npRole').value = '';
+  document.getElementById('newProfileForm').style.display = 'block';
+  document.getElementById('addProfileBtn').style.display = 'none';
+  document.getElementById('npUsername').focus();
+}
+
+function closeAddProfile() {
+  document.getElementById('newProfileForm').style.display = 'none';
+  document.getElementById('addProfileBtn').style.display = '';
+}
+
+let editingProfileUser = null;
+
+function openEditProfile(username, role) {
+  editingProfileUser = username;
+  document.getElementById('epTitle').textContent = 'Update profile: ' + username;
+  document.getElementById('epRole').value = role === 'readonly' ? 'readonly' : 'admin';
+  document.getElementById('epPassword').value = '';
+  document.getElementById('newProfileForm').style.display = 'none';
+  document.getElementById('addProfileBtn').style.display = '';
+  document.getElementById('editProfileForm').style.display = 'block';
+  document.getElementById('editProfileForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function closeEditProfile() {
+  editingProfileUser = null;
+  document.getElementById('editProfileForm').style.display = 'none';
+}
+
+async function saveProfileUpdate() {
+  if (!editingProfileUser) return;
+  const body = { role: document.getElementById('epRole').value };
+  const pw = document.getElementById('epPassword').value;
+  if (pw) {
+    if (pw.length < 6) return alert('Password must be at least 6 characters');
+    body.password = pw;
+  }
+  try {
+    await api('PUT', '/api/users/' + encodeURIComponent(editingProfileUser), body);
+    notify('Profile updated for ' + editingProfileUser);
+    closeEditProfile();
+    renderManageProfiles();
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+  }
+}
+
+async function deleteProfile(username) {
+  if (!confirm('Delete profile "' + username + '"? They will no longer be able to sign in.')) return;
+  try {
+    await api('DELETE', '/api/users/' + encodeURIComponent(username));
+    notify('Profile deleted: ' + username);
+    closeEditProfile();
+    renderManageProfiles();
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+  }
+}
+
+async function createProfile() {
+  const u = document.getElementById('npUsername').value.trim();
+  const pw = document.getElementById('npPassword').value;
+  const role = document.getElementById('npRole').value;
+  if (!u) return alert('Please enter a username');
+  if (pw.length < 6) return alert('Password must be at least 6 characters');
+  if (!role) return alert('Please select an access level');
+  try {
+    await api('POST', '/api/users', { username: u, password: pw, role });
+    notify('Profile created for ' + u);
+    renderManageProfiles();
+  } catch (e) {
+    if (e.message !== 'Session expired') alert(e.message);
+  }
+}
+
+// If you already have a valid session (page refresh), skip the login screen
+(async function restoreSession() {
+  try {
+    const r = await fetch('/api/me');
+    if (r.ok) await enterApp((await r.json()).user);
+  } catch (e) {}
+  document.body.classList.remove('booting');
+})();
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const t = titles[id];
+  if (t) {
+    pageTitle.textContent = t[0];
+    pageSubtitle.textContent = t[1];
+  }
+  if (id === 'profileSection') fillProfilePage();
+  if (id === 'dashboardSection') updateDashboardMoney();
+  if (id === 'labourSection') {
+    empPage = 1;
+    empSearch.value = '';
+    renderLabours();
+    previewNextId();
+  }
+  if (id === 'attendanceSection') {
+    attPage = 1;
+    attSearch.value = '';
+    renderAttendance();
+  }
+  if (id === 'taskSection') {
+    if (!taskSort.dataset.ready) {
+      try { taskSort.value = localStorage.getItem('workOrder') === 'old' ? 'old' : 'new'; } catch (e) {}
+      taskSort.dataset.ready = '1';
+    }
+    if (!taskReportDate.value) taskReportDate.value = todayStr();
+    taskReportPage = 1;
+    taskPage = 1;
+    renderTasks();
+  }
+  if (id === 'advanceSection') {
+    fillWageDropdowns();
+    renderAdvances();
+  }
+  if (id === 'weeklySection') {
+    wkPage = 1;
+    weekSearch.value = '';
+    renderWeekly();
+  }
+  if (id === 'monthlySection') {
+    fillWageDropdowns();
+    renderMonthly();
+    fillMonthlyDays();
+  }
+  if (id === 'reportSection') {
+    if (!reportMonth.value) reportMonth.value = todayStr().slice(0, 7);
+    updateReportCounts();
+  }
+}
+
+function updateStats() {
+  const engineers = labours.filter(l => /engineer/i.test(l.profession || '')).length;
+  const foremen = labours.filter(l => /foreman/i.test(l.profession || '')).length;
+  empStatEngineer.textContent = engineers;
+  empStatExtra.textContent = foremen;
+  empStatLabour.textContent = labours.length - engineers - foremen;   // labours + engineers + foreman = total resources
+  empStatTotal.textContent = labours.length;
+  statLabour.textContent = labours.length;
+  updateDashboardMoney();
+  updateMonthlyStats();
+}
+
+// Dashboard blocks: money paid out in the current month (system date)
+//  - expenditure = weekly (kharchi) paid this month + monthly expenditure saved for this month
+//  - advance     = advance payments dated this month
+function updateDashboardMoney() {
+  if (typeof statExpenditureMonth === 'undefined') return;
+  const ym = todayStr().slice(0, 7);
+  const sum = (arr, f) => arr.reduce((t, x) => t + f(x), 0);
+  const weekly = sum(weeklyPays.filter(w => w.date && w.date.startsWith(ym)), w => Number(w.amount) || 0);
+  const monthly = sum(monthlyPays.filter(m => (m.month || String(m.date || '').slice(0, 7)) === ym),
+    m => Math.max(0, Number(m.payable) || 0));
+  const adv = sum(advances.filter(a => a.date && a.date.startsWith(ym)), a => Number(a.amount) || 0);
+  const fmt = n => (Math.round(n * 100) / 100).toLocaleString('en-IN');
+  statExpenditureMonth.textContent = fmt(weekly + monthly);
+  statAdvanceMonth.textContent = fmt(adv);
+}
+
+// Profession menu: Engineer, Foreman, Labour (hover Labour for Plumber, Electrician, Helper)
+function profPickOpen() { profPickList.classList.add('open'); }
+function profPickClose() { profPickList.classList.remove('open'); }
+
+function profPickLeave() {
+  if (document.activeElement !== lprofession) profPickClose();   // hover-open closes when the mouse leaves
+}
+
+function profPickChoose(v) {
+  lprofession.value = v;
+  profPickClose();
+  lprofession.blur();
+}
+
+function profPickPress(e) {
+  const it = e.target.closest('[data-v]');
+  if (!it) return;
+  e.preventDefault();
+  profPickChoose(it.dataset.v);
+}
+
+function profPickKey(e) {
+  if (e.key === 'Escape' && profPickList.classList.contains('open')) {
+    e.stopPropagation();
+    profPickClose();
+  } else if (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault();
+    e.stopPropagation();
+    profPickOpen();
+  }
+}
+
+document.addEventListener('click', e => {
+  if (typeof profPicker !== 'undefined' && !profPicker.contains(e.target)) profPickClose();
+});
+
+function openEmployeeForm() {
+  editingLabourId = null;
+  lname.value = '';
+  lprofession.value = '';
+  lrate.value = '';
+  employeeFormTitle.textContent = 'Add Employee';
+  labourSaveBtn.textContent = 'Save employee';
+  previewNextId();
+  profPickClose();
+  employeeModal.classList.add('open');
+  lname.focus();
+}
+
+function closeEmployeeForm() {
+  editingLabourId = null;
+  lname.value = '';
+  lprofession.value = '';
+  lrate.value = '';
+  employeeModal.classList.remove('open');
+  previewNextId();
+}
+
+document.addEventListener('keydown', e => {
+  if (typeof employeeModal === 'undefined' || !employeeModal.classList.contains('open')) return;
+  if (e.key === 'Escape') closeEmployeeForm();
+  else if (e.key === 'Enter' && e.target.tagName === 'INPUT') addLabour();
+});
+
+function addLabour() {
+  const name = lname.value.trim();
+  const profession = lprofession.value.trim();
+  const rate = lrate.value.trim();
+
+  if (!name) return alert('Please enter a name');
+  if (!/^[A-Za-z0-9 ]+$/.test(name)) return alert('Name can contain only letters and numbers');
+  if (!profession) return alert('Please select a profession');
+  if (!/^[A-Za-z ]+$/.test(profession)) return alert('Profession can contain only letters');
+  if (profession.replace(/ /g, '').length < 2) return alert('Please select or enter a valid profession');
+  if (!rate) return alert('Please enter rate');
+  if (!/^\d+(\.\d+)?$/.test(rate)) return alert('Rate can contain only numbers');
+
+  const dup = labours.find(x =>
+    x.id !== editingLabourId &&
+    String(x.name).trim().toLowerCase() === name.toLowerCase() &&
+    String(x.profession || '').trim().toLowerCase() === profession.toLowerCase() &&
+    String(x.rate).trim() === rate
+  );
+  if (dup) {
+    return alert('This employee already exists (' + dup.id + ' - ' + dup.name + ').\nSame name, profession and rate cannot be added again.');
+  }
+
+  let highlight = false;
+  if (editingLabourId) {
+    const current = labours.find(x => x.id === editingLabourId);
+    current.name = name;
+    current.profession = profession;
+    current.rate = rate;
+    notify('Employee updated');
+  } else {
+    labours.push({
+      id: nextLabourId(),
+      name,
+      profession,
+      rate
+    });
+    highlight = true;
+    empSearch.value = '';
+    empPage = Math.ceil(labours.length / EMP_PER_PAGE);
+    notify('Employee saved with ID ' + labours[labours.length - 1].id);
+  }
+
+  save('labours', labours);
+  closeEmployeeForm();
+  renderLabours(highlight);
+  fillWageDropdowns();
+  updateStats();
+}
+
+function goEmpPage(n) {
+  empPage = n;
+  renderLabours();
+}
+
+// ---- employee month sheet: attendance + weekly + advance + amount, per employee ----
+function empRound(n) { return Math.round(n * 100) / 100; }
+
+function empBuildCtx(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const days = new Date(y, m, 0).getDate();
+  const dayKeys = [];
+  for (let d = 1; d <= days; d++) dayKeys.push(ym + '-' + String(d).padStart(2, '0'));
+
+  const att = {};
+  attendance.forEach(a => {
+    if (a.date && a.date.startsWith(ym)) att[a.labourId + '|' + a.date] = String(a.note || a.status || '').trim();
+  });
+  const wk = {};
+  weeklyPays.forEach(w => {
+    if (w.date && w.date.startsWith(ym)) wk[w.labourId + '|' + w.date] = (wk[w.labourId + '|' + w.date] || 0) + attNum(w.amount);
+  });
+  const adv = {};
+  advances.forEach(a => {
+    if (!a.date || !a.date.startsWith(ym)) return;
+    const o = adv[a.labourId] || (adv[a.labourId] = { by: [], total: 0 });
+    const by = String(a.paidBy || '').trim();
+    if (by && !o.by.includes(by)) o.by.push(by);
+    o.total += attNum(a.amount);
+  });
+  return { days, dayKeys, sundays: wkSundays(ym), att, wk, adv, isSun: d => new Date(y, m - 1, d).getDay() === 0 };
+}
+
+function empRowData(l, ctx) {
+  const dayNotes = ctx.dayKeys.map(dt => ctx.att[l.id + '|' + dt] || '');
+  const attTotal = empRound(dayNotes.reduce((t, n) => t + attNum(n), 0));
+  const rate = Number(l.rate) || 0;
+  const wages = empRound(rate * attTotal);
+  const sundayAmts = ctx.sundays.map(dt => ctx.wk[l.id + '|' + dt]);
+  const kharchi = empRound(sundayAmts.reduce((t, n) => t + (n || 0), 0));
+  const a = ctx.adv[l.id] || { by: [], total: 0 };
+  const advAmt = empRound(a.total);
+  return {
+    dayNotes, attTotal, rate: l.rate || '', wages, sundayAmts, kharchi,
+    advBy: a.by.join(', '), advAmt, amount: empRound(wages - kharchi - advAmt)
+  };
+}
+
+function renderLabours(highlightLast) {
+  if (!empMonth.value) {
+    const now = new Date();
+    empMonth.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  }
+  const ctx = empBuildCtx(empMonth.value);
+
+  let head = '<tr><th class="att-name">Name</th><th>Action</th>';
+  ctx.dayKeys.forEach((dt, i) => { head += `<th class="${ctx.isSun(i + 1) ? 'att-sun' : ''}">${i + 1}</th>`; });
+  head += '<th class="g-calc">Days total</th><th>Rate</th><th class="g-calc">Total</th>';
+  ctx.sundays.forEach(dt => { head += `<th class="att-sun">${fmtDate(dt)}</th>`; });
+  head += '<th class="g-calc">Kharchi</th><th>Advance by</th><th>Advance</th><th class="g-calc">Grand total</th></tr>';
+  empHead.innerHTML = head;
+
+  const cols = ctx.days + ctx.sundays.length + 9;
+  if (!labours.length) {
+    labourTable.innerHTML = `<tr><td colspan="${cols}" class="empty">No employees saved yet.</td></tr>`;
+    empPager.innerHTML = '';
+    return;
+  }
+
+  const q = (empSearch.value || '').trim().toLowerCase();
+  const list = labours.filter(l =>
+    !q || (l.id + ' ' + l.name + ' ' + (l.profession || '')).toLowerCase().includes(q)
+  );
+  if (!list.length) {
+    labourTable.innerHTML = `<tr><td colspan="${cols}" class="empty">No employees match your search.</td></tr>`;
+    empPager.innerHTML = '';
+    return;
+  }
+
+  const pages = Math.ceil(list.length / EMP_PER_PAGE);
+  if (empPage > pages) empPage = pages;
+  if (empPage < 1) empPage = 1;
+  const start = (empPage - 1) * EMP_PER_PAGE;
+  const pageList = list.slice(start, start + EMP_PER_PAGE);
+
+  const last = labours[labours.length - 1];
+  labourTable.innerHTML = pageList.map(l => {
+    const r = empRowData(l, ctx);
+    const cls = highlightLast && l === last ? 'row-new' : '';
+    const dayCells = r.dayNotes.map((n, i) =>
+      `<td class="${ctx.isSun(i + 1) ? 'att-sun-col' : ''}">${escHtml(n)}</td>`).join('');
+    const sunCells = r.sundayAmts.map(v => `<td>${v ? empRound(v) : ''}</td>`).join('');
+    return `
+      <tr class="${cls}">
+        <td class="att-name"><span class="nm">${escHtml(l.name)}</span></td>
+        <td>
+          <div class="actions">
+            <button class="btn-edit" onclick="editLabour('${l.id}')">Edit</button>
+            <button class="btn-delete" onclick="deleteLabour('${l.id}')">Delete</button>
+          </div>
+        </td>
+        ${dayCells}
+        <td class="c-calc">${r.attTotal}</td>
+        <td>${escHtml(r.rate)}</td>
+        <td class="c-calc">${r.wages}</td>
+        ${sunCells}
+        <td class="c-calc">${r.kharchi}</td>
+        <td>${escHtml(r.advBy)}</td>
+        <td>${r.advAmt || ''}</td>
+        <td class="c-amount ${r.amount < 0 ? 'neg' : ''}">${r.amount}</td>
+      </tr>`;
+  }).join('');
+
+  // pager
+  const from = start + 1;
+  const to = start + pageList.length;
+  empPager.innerHTML = `
+    <div class="pager-info">Showing ${from}-${to} of ${list.length}</div>
+    <div class="pager-btns">
+      <button class="pager-btn" onclick="goEmpPage(${empPage - 1})" ${empPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>
+      <button class="pager-btn active" disabled>${empPage}</button>
+      <span class="pager-gap">of ${pages}</span>
+      <button class="pager-btn" onclick="goEmpPage(${empPage + 1})" ${empPage === pages ? 'disabled' : ''}>Next &raquo;</button>
+    </div>`;
+}
+
+function deleteLabour(id) {
+  if (!confirm('Delete this employee record?')) return;
+  labours = labours.filter(l => l.id !== id);
+  save('labours', labours);
+  if (editingLabourId === id) closeEmployeeForm();
+  previewNextId();
+  renderLabours();
+  fillWageDropdowns();
+  updateStats();
+}
+
+function editLabour(id) {
+  const l = labours.find(x => x.id === id);
+  if (!l) return;
+  editingLabourId = id;
+  lid.value = l.id;
+  lname.value = l.name;
+  lprofession.value = l.profession || '';
+  lrate.value = l.rate || '';
+  employeeFormTitle.textContent = 'Edit Employee';
+  labourSaveBtn.textContent = 'Update employee';
+  profPickClose();
+  employeeModal.classList.add('open');
+  lname.focus();
+}
+
+// ---- Excel (.xlsx) export, no extra library needed ----
+// sheets = [{ name, rows, widths, bold }]  -> one workbook with one tab per entry
+function makeXlsxBook(sheets) {
+  const enc = new TextEncoder();
+  const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const colName = i => { let n = i + 1, t = ''; while (n > 0) { const r = (n - 1) % 26; t = String.fromCharCode(65 + r) + t; n = Math.floor((n - 1) / 26); } return t; };
+  const safeName = n => String(n).replace(/[\\\/\?\*\[\]:]/g, ' ').slice(0, 31) || 'Sheet';
+
+  const sheetXml = sh => {
+    const boldRows = sh.bold || [0];
+    const sheetRows = sh.rows.map((row, r) => {
+      const cells = row.map((v, c) => {
+        const ref = colName(c) + (r + 1);
+        const style = boldRows.includes(r) ? ' s="1"' : '';
+        if (typeof v === 'number') return `<c r="${ref}"${style}><v>${v}</v></c>`;
+        return `<c r="${ref}"${style} t="inlineStr"><is><t xml:space="preserve">${esc(v)}</t></is></c>`;
+      }).join('');
+      return `<row r="${r + 1}">${cells}</row>`;
+    }).join('');
+    const cols = (sh.widths || []).map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('');
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${cols ? '<cols>' + cols + '</cols>' : ''}<sheetData>${sheetRows}</sheetData></worksheet>`;
+  };
+
+  const n = sheets.length;
+  const sheetOverrides = sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('');
+  const sheetTags = sheets.map((sh, i) => `<sheet name="${esc(safeName(sh.name))}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('');
+  const sheetRels = sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('');
+
+  const files = {
+    '[Content_Types].xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' + sheetOverrides + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>',
+    '_rels/.rels': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+    'xl/workbook.xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' + sheetTags + '</sheets></workbook>',
+    'xl/_rels/workbook.xml.rels': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheetRels + `<Relationship Id="rId${n + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
+    'xl/styles.xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'
+  };
+  sheets.forEach((sh, i) => { files['xl/worksheets/sheet' + (i + 1) + '.xml'] = sheetXml(sh); });
+
+  // CRC32
+  const table = new Uint32Array(256).map((_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    return c >>> 0;
+  });
+  const crc32 = bytes => {
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) c = table[(c ^ bytes[i]) & 255] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  };
+
+  // ZIP (stored, no compression)
+  const parts = [];
+  const central = [];
+  let offset = 0;
+  const u16 = n => [n & 255, (n >>> 8) & 255];
+  const u32 = n => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+
+  Object.keys(files).forEach(name => {
+    const nameBytes = enc.encode(name);
+    const data = enc.encode(files[name]);
+    const crc = crc32(data);
+    const local = new Uint8Array([
+      ...u32(0x04034b50), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21),
+      ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameBytes.length), ...u16(0)
+    ]);
+    parts.push(local, nameBytes, data);
+    central.push(new Uint8Array([
+      ...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0x21),
+      ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameBytes.length),
+      ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(offset)
+    ]), nameBytes);
+    offset += local.length + nameBytes.length + data.length;
+  });
+
+  const centralSize = central.reduce((n, a) => n + a.length, 0);
+  const end = new Uint8Array([
+    ...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(Object.keys(files).length), ...u16(Object.keys(files).length),
+    ...u32(centralSize), ...u32(offset), ...u16(0)
+  ]);
+
+  return new Blob([...parts, ...central, end], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  });
+}
+
+
+// single-sheet helper used by the existing download buttons
+function makeXlsx(rows, colWidths, boldRows = [0]) {
+  return makeXlsxBook([{ name: 'Employees', rows, widths: colWidths, bold: boldRows }]);
+}
+
+// trigger a browser download for a generated workbook
+function saveXlsxFile(blob, filename) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
+function downloadEmployeesExcel() {
+  if (!labours.length) return alert('No employees to download yet.');
+  const ym = empMonth.value;
+  if (!ym) return alert('Select a month first.');
+  const ctx = empBuildCtx(ym);
+
+  const rows = [[
+    'Employee ID', 'Name', 'Profession',
+    ...ctx.dayKeys.map((d, i) => String(i + 1)),
+    'Days total', 'Rate', 'Total',
+    ...ctx.sundays.map(fmtDate),
+    'Kharchi', 'Advance by', 'Advance', 'Grand total'
+  ]];
+  let tWages = 0, tKharchi = 0, tAdv = 0, tAmount = 0;
+  labours.forEach(l => {
+    const r = empRowData(l, ctx);
+    tWages += r.wages; tKharchi += r.kharchi; tAdv += r.advAmt; tAmount += r.amount;
+    const rateNum = Number(r.rate);
+    rows.push([
+      l.id, l.name, l.profession || '',
+      ...r.dayNotes.map(n => n === '' ? '' : (isNaN(Number(n)) ? n : Number(n))),
+      r.attTotal, r.rate !== '' && !isNaN(rateNum) ? rateNum : r.rate, r.wages,
+      ...r.sundayAmts.map(v => v ? empRound(v) : ''),
+      r.kharchi, r.advBy, r.advAmt || '', r.amount
+    ]);
+  });
+  const blank = n => Array(n).fill('');
+  rows.push([
+    '', 'TOTAL', '',
+    ...blank(ctx.days), '', '', empRound(tWages),
+    ...blank(ctx.sundays.length),
+    empRound(tKharchi), '', empRound(tAdv), empRound(tAmount)
+  ]);
+
+  const widths = [14, 26, 20, ...Array(ctx.days).fill(5), 11, 10, 12, ...Array(ctx.sundays.length).fill(13), 12, 22, 15, 14];
+  const blob = makeXlsx(rows, widths, [0, rows.length - 1]);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Employees_' + ym + '.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+const ATT_PER_PAGE = 10;
+let attPage = 1;
+let attDraft = {};   // unsaved edits, key "labourId|YYYY-MM-DD" -> text
+
+function attNum(v) {
+  const t = String(v == null ? '' : v).trim();
+  return /^\d+(\.\d+)?$/.test(t) ? parseFloat(t) : 0;
+}
+
+function attRowTotal(row) {
+  let sum = 0;
+  row.querySelectorAll('input').forEach(i => { sum += attNum(i.value); });
+  return Math.round(sum * 100) / 100;
+}
+
+function attCellInput(inp) {
+  inp.value = inp.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1');
+  attDraft[inp.dataset.k] = inp.value;
+  inp.closest('tr').querySelector('.att-total').textContent = attRowTotal(inp.closest('tr'));
+}
+
+function goAttPage(n) {
+  attPage = n;
+  renderAttendance();
+}
+
+function renderAttendance() {
+  if (!attendanceMonth.value) {
+    const now = new Date();
+    attendanceMonth.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  }
+  const ym = attendanceMonth.value;
+  const [y, m] = ym.split('-').map(Number);
+  const days = new Date(y, m, 0).getDate();
+  const isSun = d => new Date(y, m - 1, d).getDay() === 0;
+  const readOnly = me && me.role === 'readonly';
+
+  let head = '<tr><th class="att-name">Name</th>';
+  for (let d = 1; d <= days; d++) head += `<th class="${isSun(d) ? 'att-sun' : ''}">${d}</th>`;
+  head += '<th class="att-total">Total</th></tr>';
+  attHead.innerHTML = head;
+
+  const cols = days + 2;
+  if (!labours.length) {
+    attendanceTable.innerHTML = `<tr><td colspan="${cols}" class="empty">Add employee first.</td></tr>`;
+    attPager.innerHTML = '';
+    return;
+  }
+
+  const q = (attSearch.value || '').trim().toLowerCase();
+  const list = labours.filter(l => !q || String(l.name).toLowerCase().includes(q));
+  if (!list.length) {
+    attendanceTable.innerHTML = `<tr><td colspan="${cols}" class="empty">No employees match your search.</td></tr>`;
+    attPager.innerHTML = '';
+    return;
+  }
+
+  const pages = Math.ceil(list.length / ATT_PER_PAGE);
+  if (attPage > pages) attPage = pages;
+  if (attPage < 1) attPage = 1;
+  const start = (attPage - 1) * ATT_PER_PAGE;
+  const pageList = list.slice(start, start + ATT_PER_PAGE);
+
+  attendanceTable.innerHTML = pageList.map(l => {
+    let cells = '';
+    let total = 0;
+    for (let d = 1; d <= days; d++) {
+      const date = ym + '-' + String(d).padStart(2, '0');
+      const key = l.id + '|' + date;
+      const ex = attendance.find(a => a.labourId === l.id && a.date === date);
+      const wt = attLockOwner(ex);          // the work that owns this day, if any
+      let note;
+      if (!wt && key in attDraft) {
+        note = attDraft[key];
+      } else {
+        note = ex ? (ex.note || ex.status || '') : '';
+      }
+      total += attNum(note);
+      const lockAttrs = wt
+        ? `readonly data-w="${escHtml(wt.id)}" title="Added from work: ${escHtml(wt.description)}" onclick="attLockedClick(this)" onkeydown="attLockedKey(event, this)"`
+        : '';
+      cells += `<td class="${isSun(d) ? 'att-sun-col' : ''}${wt ? ' att-locked' : ''}"><input data-k="${escHtml(key)}" value="${escHtml(note)}" inputmode="decimal" maxlength="5" oninput="attCellInput(this)" ${lockAttrs} ${readOnly ? 'disabled' : ''}></td>`;
+    }
+    total = Math.round(total * 100) / 100;
+    return `<tr><td class="att-name">${escHtml(l.name)}</td>${cells}<td class="att-total">${total}</td></tr>`;
+  }).join('');
+
+  const from = start + 1;
+  const to = start + pageList.length;
+  attPager.innerHTML = `
+    <div class="pager-info">Showing ${from}-${to} of ${list.length}</div>
+    <div class="pager-btns">
+      <button class="pager-btn" onclick="goAttPage(${attPage - 1})" ${attPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>
+      <button class="pager-btn active" disabled>${attPage}</button>
+      <span class="pager-gap">of ${pages}</span>
+      <button class="pager-btn" onclick="goAttPage(${attPage + 1})" ${attPage === pages ? 'disabled' : ''}>Next &raquo;</button>
+    </div>`;
+}
+
+function attNoteFor(labourId, date) {
+  const key = labourId + '|' + date;
+  if (key in attDraft) return attDraft[key];
+  const ex = attendance.find(a => a.labourId === labourId && a.date === date);
+  return ex ? (ex.note || ex.status || '') : '';
+}
+
+function downloadAttendanceExcel() {
+  if (!labours.length) return alert('No employees to download yet.');
+  const ym = attendanceMonth.value;
+  if (!ym) return alert('Select a month first.');
+  const [y, m] = ym.split('-').map(Number);
+  const days = new Date(y, m, 0).getDate();
+
+  const head = ['Name'];
+  for (let d = 1; d <= days; d++) head.push(String(d));
+  head.push('Total');
+  const rows = [head];
+
+  labours.forEach(l => {
+    const row = [l.name];
+    let total = 0;
+    for (let d = 1; d <= days; d++) {
+      const note = String(attNoteFor(l.id, ym + '-' + String(d).padStart(2, '0'))).trim();
+      if (note === '') { row.push(''); continue; }
+      const n = Number(note);
+      if (isNaN(n)) { row.push(note); continue; }
+      total += n;
+      row.push(n);
+    }
+    row.push(Math.round(total * 100) / 100);
+    rows.push(row);
+  });
+
+  const widths = [26];
+  for (let d = 1; d <= days; d++) widths.push(5);
+  widths.push(9);
+  const blob = makeXlsx(rows, widths);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Attendance_' + ym + '.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function saveAttendance() {
+  const skipped = [];
+  const keys = Object.keys(attDraft);
+  if (!keys.length) return notify('No changes to save');
+  keys.forEach(k => {
+    const [labourId, date] = k.split('|');
+    const l = labours.find(x => x.id === labourId);
+    if (!l) return;
+    const owner = attLockOwner(attendance.find(a => a.labourId === labourId && a.date === date));
+    if (owner) { skipped.push(l.name + ' (' + fmtDate(date) + ') - ' + owner.description); return; }
+    const note = String(attDraft[k]).trim();
+    attendance = attendance.filter(a => !(a.labourId === labourId && a.date === date));
+    if (note !== '') attendance.push({ labourId, name: l.name, date, note });
+  });
+  attDraft = {};
+  save('attendance', attendance);
+  notify('Attendance saved');
+  if (skipped.length) {
+    showInfo('Some attendance was not changed',
+      'These days were added from <b>Work and Task</b>, so they can only be changed from that work:<br><br>' +
+      skipped.map(x => '&bull; ' + escHtml(x)).join('<br>'));
+    renderAttendance();
+  }
+}
+
+function labourOptionsHtml() {
+  return '<option value="">Select employee name</option>' +
+    labours.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+}
+
+function getLabour(id) {
+  return labours.find(l => l.id === id);
+}
+
+function fillWageDropdowns() {
+  const html = labourOptionsHtml();
+  const keepAdv = advLabour.value;
+  const keepMonth = monthLabour.value;
+  advLabour.innerHTML = html;
+  monthLabour.innerHTML = html;
+  advLabour.value = keepAdv;
+  monthLabour.value = keepMonth;
+  advPickSync();
+  monthPicker.sync();
+}
+
+function fillAdvanceLabour() {
+  const l = getLabour(advLabour.value);
+  advRate.value = l ? (l.rate || '') : '';
+}
+
+// ---- searchable employee picker (advance payment) ----
+let advPickIdx = -1;
+
+function advPickSync() {
+  if (typeof advPickInput === 'undefined') return;
+  const l = getLabour(advLabour.value);
+  advPickInput.value = l ? l.name : '';
+}
+
+function advPickMatches() {
+  const selected = getLabour(advLabour.value);
+  let q = advPickInput.value.trim().toLowerCase();
+  if (selected && q === String(selected.name).toLowerCase()) q = '';   // show everyone when re-opening
+  return labours.filter(l => !q || (l.name + ' ' + l.id).toLowerCase().includes(q));
+}
+
+function advPickOpen(typing) {
+  if (!typing) advPickInput.select();
+  const list = advPickMatches();
+  advPickIdx = list.length ? 0 : -1;
+  advPickList.innerHTML = list.length
+    ? list.map((l, i) => `<div class="picker-item ${i === 0 ? 'active' : ''}" data-id="${escHtml(l.id)}" onmousedown="event.preventDefault(); advPickChoose(this.dataset.id)">${escHtml(l.name)}</div>`).join('')
+    : '<div class="picker-none">No employee found</div>';
+  advPickList.classList.add('open');
+}
+
+function advPickClear() {
+  advLabour.value = '';
+  fillAdvanceLabour();
+  advPickSync();
+  advPickList.classList.remove('open');
+}
+
+function advPickClose() {
+  advPickList.classList.remove('open');
+  advPickSync();
+}
+
+function advPickChoose(id) {
+  advLabour.value = id;
+  fillAdvanceLabour();
+  advPickSync();
+  advPickList.classList.remove('open');
+  advPickInput.blur();
+}
+
+function advPickKey(e) {
+  const items = [...advPickList.querySelectorAll('.picker-item')];
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!advPickList.classList.contains('open')) return advPickOpen();
+    if (!items.length) return;
+    advPickIdx = (advPickIdx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle('active', i === advPickIdx));
+    items[advPickIdx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (items[advPickIdx]) advPickChoose(items[advPickIdx].dataset.id);
+  } else if (e.key === 'Escape') {
+    advPickClose();
+    advPickInput.blur();
+  }
+}
+
+document.addEventListener('click', e => {
+  if (typeof advPicker !== 'undefined' && !advPicker.contains(e.target)) advPickClose();
+});
+
+// ---- advance payments ----
+let editingAdvanceIdx = null;
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function fmtDate(str) {
+  if (!str) return '-';
+  const [y, m, d] = String(str).split('-');
+  return d + '-' + m + '-' + y;
+}
+
+function clearAdvance() {
+  editingAdvanceIdx = null;
+  advLabour.value = '';
+  advRate.value = '';
+  advAmount.value = '';
+  advPaidBy.value = '';
+  advMode.value = '';
+  advPickSync();
+  advFormTitle.textContent = 'Add advance payment';
+  advSaveBtn.textContent = 'Save';
+}
+
+function saveAdvance() {
+  const l = getLabour(advLabour.value);
+  if (!l) return alert('Select employee');
+  const amount = advAmount.value.trim();
+  const paidBy = advPaidBy.value.trim();
+  if (!amount) return alert('Enter amount');
+  if (!/^\d+(\.\d+)?$/.test(amount) || Number(amount) <= 0) return alert('Amount can contain only numbers');
+  if (!paidBy) return alert('Enter paid by');
+  if (!/^[A-Za-z ]+$/.test(paidBy)) return alert('Paid by can contain only letters');
+  if (!advMode.value) return alert('Select mode');
+
+  const fields = {
+    labourId: l.id,
+    name: l.name,
+    rate: l.rate || advRate.value,
+    amount,
+    paidBy,
+    mode: advMode.value
+  };
+
+  if (editingAdvanceIdx !== null && advances[editingAdvanceIdx]) {
+    Object.assign(advances[editingAdvanceIdx], fields);      // keeps the original date
+    notify('Advance payment updated');
+    save('advances', advances);
+    clearAdvance();
+    renderAdvances();
+    return;
+  }
+  advances.push({ ...fields, date: todayStr() });            // system date at the time of entry
+  save('advances', advances);
+  renderAdvances(true);
+  clearAdvance();
+  notify('Advance payment saved');
+}
+
+function editAdvance(i) {
+  const a = advances[i];
+  if (!a) return;
+  editingAdvanceIdx = i;
+  advLabour.value = a.labourId;
+  advPickSync();
+  fillAdvanceLabour();
+  if (!advRate.value) advRate.value = a.rate || '';
+  advAmount.value = a.amount || '';
+  advPaidBy.value = a.paidBy || '';
+  advMode.value = a.mode || '';
+  advFormTitle.textContent = 'Edit advance payment';
+  advSaveBtn.textContent = 'Update';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteAdvance(i) {
+  if (!advances[i]) return;
+  if (!confirm('Delete this advance payment?')) return;
+  advances.splice(i, 1);
+  save('advances', advances);
+  clearAdvance();
+  renderAdvances();
+  notify('Advance payment deleted');
+}
+
+function updateAdvanceTotal() {
+  const ym = todayStr().slice(0, 7);
+  const total = advances
+    .filter(a => a.date && a.date.startsWith(ym))
+    .reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+  advTotalValue.textContent = (Math.round(total * 100) / 100).toLocaleString('en-IN');
+  advTotalMonth.textContent = new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+
+  const now = new Date();
+  const pd = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevYm = pd.getFullYear() + '-' + String(pd.getMonth() + 1).padStart(2, '0');
+  const prev = advances
+    .filter(a => a.date && a.date.startsWith(prevYm))
+    .reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+  advPrevValue.textContent = (Math.round(prev * 100) / 100).toLocaleString('en-IN');
+  advPrevMonth.textContent = pd.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+}
+
+function renderAdvances(highlightLast) {
+  updateAdvanceTotal();
+  if (!advances.length) {
+    advanceTable.innerHTML = '<tr><td colspan="7" class="empty">No advance payments yet.</td></tr>';
+    return;
+  }
+  advanceTable.innerHTML = advances.map((a, i) => `
+    <tr class="${highlightLast && i === advances.length - 1 ? 'row-new' : ''}">
+      <td>${fmtDate(a.date)}</td>
+      <td>${escHtml(a.name)}</td>
+      <td>${escHtml(a.rate)}</td>
+      <td>${escHtml(a.amount || '-')}</td>
+      <td>${escHtml(a.paidBy)}</td>
+      <td>${escHtml(a.mode)}</td>
+      <td>
+        <div class="actions">
+          <button class="btn-edit" onclick="editAdvance(${i})">Edit</button>
+          <button class="btn-delete" onclick="deleteAdvance(${i})">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function downloadAdvancesExcel() {
+  if (!advances.length) return alert('No advance payments to download yet.');
+  const rows = [['Date', 'Name', 'Rate', 'Amount', 'Paid by', 'Mode']];
+  let total = 0;
+  advances.forEach(a => {
+    const rate = Number(a.rate);
+    const amt = Number(a.amount);
+    if (!isNaN(amt)) total += amt;
+    rows.push([
+      fmtDate(a.date),
+      a.name,
+      a.rate !== '' && a.rate != null && !isNaN(rate) ? rate : (a.rate || ''),
+      a.amount !== '' && a.amount != null && !isNaN(amt) ? amt : (a.amount || ''),
+      a.paidBy || '',
+      a.mode || ''
+    ]);
+  });
+  rows.push(['', 'Total', '', Math.round(total * 100) / 100, '', '']);
+  const blob = makeXlsx(rows, [14, 28, 12, 14, 20, 12]);
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'Advance_Payments_' + todayStr() + '.xlsx';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
+// ---- Work and Task ----
+let editingTaskId = null;
+let taskSelected = [];     // employee ids added to the task being edited
+let taskPickIdx = -1;
+
+const ICON_DL = '<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>';
+const ICON_EDIT = '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+const ICON_DEL = '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+
+function daysBetween(a, b) {
+  const d1 = new Date(a + 'T00:00:00');
+  const d2 = new Date(b + 'T00:00:00');
+  return Math.round((d2 - d1) / 86400000) + 1;     // both dates count
+}
+
+function taskDaysText(t) {
+  const n = daysBetween(t.startDate, t.endDate);
+  const txt = n + (n === 1 ? ' day' : ' days');
+  return t.status === 'Completed' ? txt : txt + ' (planned)';
+}
+
+const TASK_STATUS_LABEL = { 'To be started': 'New work', 'In progress': 'Work in progress', 'Completed': 'Work completed' };
+const TASK_TAB_STATUS = { new: 'To be started', prog: 'In progress', done: 'Completed' };
+const TASK_CARDS_PER_PAGE = 2;
+const TASK_MAX_PHOTOS = 5;
+let taskTab = 'new';
+let taskPhotos = [];
+
+function taskStatusBadge(st) {
+  const cls = st === 'Completed' ? 'st-done' : st === 'In progress' ? 'st-prog' : 'st-todo';
+  return `<span class="st-badge ${cls}">${escHtml(TASK_STATUS_LABEL[st] || st)}</span>`;
+}
+
+function taskEmpNames(t) {
+  return (t.employees || []).map(e => {
+    const l = getLabour(e.id);
+    return l ? l.name : e.name;
+  });
+}
+
+function taskEmpCell(t) {
+  const n = (t.employees || []).length;
+  return `<strong>${n}</strong> employee${n === 1 ? '' : 's'}`;
+}
+
+// searchable multi-select
+function taskPickMatches() {
+  const q = taskPickInput.value.trim().toLowerCase();
+  return labours.filter(l => !taskSelected.includes(l.id) &&
+    (!q || (l.name + ' ' + l.id).toLowerCase().includes(q)));
+}
+
+// employees already inside another work that is "In progress" (not offered for a new/active work)
+function taskBusyMap() {
+  const m = new Map();
+  if (taskStatus.value === 'Completed') return m;       // finished work is only a record, no clash
+  tasks.forEach(t => {
+    if (t.status !== 'In progress' || t.id === editingTaskId) return;
+    (t.employees || []).forEach(e => { if (!m.has(e.id)) m.set(e.id, t); });
+  });
+  return m;
+}
+
+function taskPickOpen(typing) {
+  const list = taskPickMatches();
+  const busy = taskBusyMap();
+  const free = list.filter(l => !busy.has(l.id));
+  const taken = list.filter(l => busy.has(l.id));
+  taskPickIdx = free.length ? 0 : -1;
+  let html = free.map((l, i) => `<div class="picker-item ${i === 0 ? 'active' : ''}" data-id="${escHtml(l.id)}" onmousedown="event.preventDefault(); taskPickChoose(this.dataset.id)">${escHtml(l.name)}</div>`).join('');
+  html += taken.map(l => `<div class="picker-busy" title="Already in a work that is in progress" onmousedown="event.preventDefault()">${escHtml(l.name)}<small>Busy &middot; in progress: ${escHtml(busy.get(l.id).description)}</small></div>`).join('');
+  if (!html) html = `<div class="picker-none">${labours.length && !taskPickInput.value.trim() ? 'All employees added' : 'No employee found'}</div>`;
+  taskPickList.innerHTML = html;
+  taskPickList.classList.add('open');
+  taskPicker.classList.add('open');
+}
+
+function taskPickClose() {
+  taskPickList.classList.remove('open');
+  taskPicker.classList.remove('open');
+  taskPickInput.value = '';
+}
+
+function taskPickChoose(id) {
+  if (!taskSelected.includes(id)) taskSelected.push(id);
+  taskPickInput.value = '';
+  renderTaskChips();
+  taskPickOpen(true);              // stay open so more employees can be added
+}
+
+function taskPickKey(e) {
+  const items = [...taskPickList.querySelectorAll('.picker-item')];
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!taskPickList.classList.contains('open')) return taskPickOpen();
+    if (!items.length) return;
+    taskPickIdx = (taskPickIdx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle('active', i === taskPickIdx));
+    items[taskPickIdx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (items[taskPickIdx]) taskPickChoose(items[taskPickIdx].dataset.id);
+  } else if (e.key === 'Escape') {
+    taskPickClose();
+    taskPickInput.blur();
+  }
+}
+
+document.addEventListener('click', e => {
+  if (typeof taskPicker !== 'undefined' && !taskPicker.contains(e.target)) taskPickClose();
+});
+
+function renderTaskChips() {
+  taskChips.innerHTML = taskSelected.map(id => {
+    const l = getLabour(id);
+    const name = l ? l.name : id;
+    return `<span class="chip">${escHtml(name)}<button type="button" title="Remove" data-id="${escHtml(id)}" onclick="taskRemoveEmp(this.dataset.id)">&times;</button></span>`;
+  }).join('');
+}
+
+function taskRemoveEmp(id) {
+  taskSelected = taskSelected.filter(x => x !== id);
+  renderTaskChips();
+}
+
+function syncTaskDates() {
+  // the calendar greys out days before the start date
+  taskEnd.min = taskStart.value || '';
+  if (taskEnd.value && taskStart.value && taskEnd.value < taskStart.value) taskEnd.value = '';
+}
+
+function clearTask() {
+  editingTaskId = null;
+  taskSelected = [];
+  taskDesc.value = '';
+  taskLocation.value = '';
+  taskStart.value = '';
+  taskEnd.value = '';
+  taskEnd.min = '';
+  taskStatus.value = 'To be started';
+  taskPickInput.value = '';
+  renderTaskChips();
+  taskFormTitle.textContent = 'Add new work';
+  taskSaveBtn.textContent = 'Save';
+  taskPhotos = [];
+  renderTaskPhotoGrid();
+}
+
+function nextTaskId() {
+  const nums = tasks.map(t => parseInt(String(t.id).replace(/\D/g, ''), 10) || 0);
+  return 'TASK-' + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(3, '0');
+}
+
+function saveTask() {
+  const description = taskDesc.value.trim();
+  const location = taskLocation.value.trim();
+  if (!description) return alert('Please enter the task description');
+  if (!/^[A-Za-z0-9 ]+$/.test(description)) return alert('Task description can contain only letters and numbers');
+  if (!location) return alert('Please enter the location');
+  if (!/^[A-Za-z0-9 ]+$/.test(location)) return alert('Location can contain only letters and numbers');
+  if (!taskStart.value) return alert('Select the start date');
+  if (!taskEnd.value) return alert('Select the end date');
+  if (taskEnd.value < taskStart.value) return alert('End date must be on or after the start date');
+  if (!taskSelected.length) return alert('Add at least one employee to the task');
+
+  // one in-progress work per employee (finished work is only a record, so it is not checked)
+  if (taskStatus.value !== 'Completed') {
+    const prev = editingTaskId ? tasks.find(x => x.id === editingTaskId) : null;
+    const keep = prev && prev.status === taskStatus.value ? prev : null;
+    const clash = taskConflicts(taskSelected, editingTaskId, keep);
+    if (clash.length) return showTaskConflict(clash, false);
+  }
+
+  // a work becomes Completed only after attendance is filled and a photo is uploaded
+  if (taskStatus.value === 'Completed') {
+    const prev = editingTaskId ? tasks.find(x => x.id === editingTaskId) : null;
+    if (!prev || prev.status !== 'Completed') {
+      const probe = {
+        startDate: taskStart.value,
+        endDate: taskEnd.value,
+        employees: taskSelected.map(id => ({ id, name: (getLabour(id) || {}).name || id }))
+      };
+      const gaps = taskCompletionGaps(probe, taskPhotos.length);
+      if (gaps.photos || gaps.missing.length) return showCompletionBlock(gaps, null);
+    }
+  }
+
+  const data = {
+    description,
+    location,
+    startDate: taskStart.value,
+    endDate: taskEnd.value,
+    status: taskStatus.value,
+    employees: taskSelected.map(id => ({ id, name: (getLabour(id) || {}).name || id })),
+    photos: taskPhotos.slice()
+  };
+
+  if (editingTaskId) {
+    const t = tasks.find(x => x.id === editingTaskId);
+    if (t) Object.assign(t, data);
+    notify('Task updated');
+  } else {
+    tasks.push({ id: nextTaskId(), ...data });
+    notify('Task saved');
+  }
+  save('tasks', tasks);
+  taskTab = Object.keys(TASK_TAB_STATUS).find(k => TASK_TAB_STATUS[k] === data.status) || 'new';
+  taskPage = 1;
+  closeTaskForm();
+  renderTasks();
+}
+
+function editTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  editingTaskId = id;
+  taskDesc.value = t.description;
+  taskLocation.value = t.location;
+  taskStart.value = t.startDate;
+  taskEnd.value = t.endDate;
+  taskEnd.min = t.startDate;
+  taskStatus.value = t.status;
+  taskSelected = (t.employees || []).map(e => e.id);
+  renderTaskChips();
+  taskPhotos = (t.photos || []).slice();
+  renderTaskPhotoGrid();
+  taskFormTitle.textContent = 'Edit work';
+  taskSaveBtn.textContent = 'Update';
+  taskModal.classList.add('open');
+}
+
+function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  save('tasks', tasks);
+  if (editingTaskId === id) clearTask();
+  renderTasks();
+  notify('Task deleted');
+}
+
+const TASK_PER_PAGE = 10;
+let taskReportPage = 1;
+let taskPage = 1;
+
+function taskPagerHtml(page, pages, total, fn, size = TASK_PER_PAGE) {
+  const from = (page - 1) * size + 1;
+  const to = Math.min(page * size, total);
+  return `
+    <div class="pager-info">Showing ${from}-${to} of ${total}</div>
+    <div class="pager-btns">
+      <button class="pager-btn" onclick="${fn}(${page - 1})" ${page === 1 ? 'disabled' : ''}>&laquo; Prev</button>
+      <button class="pager-btn active" disabled>${page}</button>
+      <span class="pager-gap">of ${pages}</span>
+      <button class="pager-btn" onclick="${fn}(${page + 1})" ${page === pages ? 'disabled' : ''}>Next &raquo;</button>
+    </div>`;
+}
+
+function goTaskReportPage(n) { taskReportPage = n; renderTasks(); }
+function goTaskPage(n) { taskPage = n; renderTasks(); }
+
+function renderTasks() {
+  // ---- daily report: tasks running on the chosen date ----
+  const day = taskReportDate.value || todayStr();
+  const active = tasks.filter(t => t.startDate <= day && day <= t.endDate)
+    .sort((a, b) => a.description.localeCompare(b.description));
+  const uniq = new Set();
+  active.forEach(t => (t.employees || []).forEach(e => uniq.add(e.id)));
+  taskReportSum.textContent = active.length
+    ? `Total employees working: ${uniq.size}  |  Tasks running: ${active.length}`
+    : '';
+
+  if (!active.length) {
+    taskReportTable.innerHTML = '<tr><td colspan="5" class="empty">No tasks running on this date.</td></tr>';
+    taskReportPager.innerHTML = '';
+  } else {
+    const pages = Math.ceil(active.length / TASK_PER_PAGE);
+    if (taskReportPage > pages) taskReportPage = pages;
+    if (taskReportPage < 1) taskReportPage = 1;
+    const start = (taskReportPage - 1) * TASK_PER_PAGE;
+    taskReportTable.innerHTML = active.slice(start, start + TASK_PER_PAGE).map(t => `
+      <tr>
+        <td>${escHtml(t.description)}</td>
+        <td>${escHtml(t.location)}</td>
+        <td>${taskEmpCell(t)}</td>
+        <td>${taskDaysText(t)}</td>
+        <td>${taskStatusBadge(t.status)}</td>
+      </tr>`).join('');
+    taskReportPager.innerHTML = taskPagerHtml(taskReportPage, pages, active.length, 'goTaskReportPage');
+  }
+
+  // ---- work cards for the selected tab, newest first (filtered by the search box) ----
+  const rawQ = (taskSearch.value || '').trim();
+  const q = rawQ.toLowerCase();
+  const matched = {};
+  Object.keys(TASK_TAB_STATUS).forEach(k => {
+    matched[k] = tasks.filter(t => t.status === TASK_TAB_STATUS[k] && taskMatchesSearch(t, q));
+    document.getElementById('wcnt_' + k).textContent = matched[k].length;
+    document.getElementById('wtab_' + k).classList.toggle('active', k === taskTab);
+  });
+  const list = taskOrder(matched[taskTab]);
+  if (!list.length) {
+    const label = TASK_STATUS_LABEL[TASK_TAB_STATUS[taskTab]].toLowerCase();
+    const others = Object.keys(matched).filter(k => k !== taskTab).reduce((n, k) => n + matched[k].length, 0);
+    const msg = !q ? `No ${escHtml(label)} yet.`
+      : `No ${escHtml(label)} matches &ldquo;${escHtml(rawQ)}&rdquo;.` + (others ? ` ${others} found in the other tabs.` : '');
+    taskCards.innerHTML = `<div class="card"><div class="empty">${msg}</div></div>`;
+    taskPager.innerHTML = '';
+    return;
+  }
+  const pages = Math.ceil(list.length / TASK_CARDS_PER_PAGE);
+  if (taskPage > pages) taskPage = pages;
+  if (taskPage < 1) taskPage = 1;
+  const start = (taskPage - 1) * TASK_CARDS_PER_PAGE;
+  const idx = taskAttIndex();
+  taskCards.innerHTML = list.slice(start, start + TASK_CARDS_PER_PAGE).map(t => taskCardHtml(t, idx)).join('');
+  taskCards.querySelectorAll('.work-card').forEach(c => taskRecalcCard(c));
+  taskPager.innerHTML = pages > 1 ? workPagerHtml(taskPage, pages, list.length) : '';
+}
+
+// ---------- work cards ----------
+const TASK_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+
+// a work matches when every typed word appears in its description, location or an employee name
+function taskMatchesSearch(t, q) {
+  if (!q) return true;
+  const hay = [t.description, t.location, ...taskEmpNames(t)].join(' ').toLowerCase();
+  return q.split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+}
+
+const ICON_PREV = '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>';
+const ICON_NEXT = '<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>';
+
+function workPagerHtml(page, pages, total) {
+  const from = (page - 1) * TASK_CARDS_PER_PAGE + 1;
+  const to = Math.min(page * TASK_CARDS_PER_PAGE, total);
+  return `
+    <div class="pager-info">Showing ${from}-${to} of ${total}</div>
+    <div class="pager-btns">
+      <button class="pager-btn pager-ic" title="Previous page" aria-label="Previous page" onclick="goTaskPage(${page - 1}); window.scrollTo({ top: 0, behavior: 'smooth' })" ${page === 1 ? 'disabled' : ''}>${ICON_PREV}</button>
+      <button class="pager-btn active" disabled>${page}</button>
+      <span class="pager-gap">of ${pages}</span>
+      <button class="pager-btn pager-ic" title="Next page" aria-label="Next page" onclick="goTaskPage(${page + 1}); window.scrollTo({ top: 0, behavior: 'smooth' })" ${page === pages ? 'disabled' : ''}>${ICON_NEXT}</button>
+    </div>`;
+}
+
+// Daily report as Excel: this is where the employee names are listed
+function downloadDailyReport() {
+  const day = taskReportDate.value || todayStr();
+  const active = tasks.filter(t => t.startDate <= day && day <= t.endDate)
+    .sort((a, b) => a.description.localeCompare(b.description));
+  if (!active.length) return alert('No tasks running on ' + fmtDate(day) + ', so there is nothing to download.');
+  const uniq = new Set();
+  active.forEach(t => (t.employees || []).forEach(e => uniq.add(e.id)));
+  const rows = [
+    ['Daily report', ''],
+    ['Date', fmtDate(day)],
+    ['Total employees working', uniq.size],
+    ['Tasks running', active.length],
+    ['', '']
+  ];
+  const headRow = rows.length;
+  rows.push(['Task', 'Location', 'Employees', 'No. of employees', 'Days taken', 'Status']);
+  active.forEach(t => {
+    const names = taskEmpNames(t);
+    rows.push([t.description, t.location, names.join(', '), names.length, taskDaysText(t), TASK_STATUS_LABEL[t.status] || t.status]);
+  });
+  saveXlsxFile(makeXlsxBook([{ name: 'Daily report', rows, widths: [30, 22, 54, 16, 18, 18], bold: [0, headRow] }]),
+    'Daily_Report_' + day + '.xlsx');
+}
+
+
+// employees (from ids) who are already in ANOTHER work that is In progress.
+// "keep" = the saved version of the same work, so people who were already in it are not blocked again.
+function taskConflicts(ids, selfId, keep) {
+  const out = [];
+  ids.forEach(id => {
+    if (keep && (keep.employees || []).some(e => e.id === id)) return;
+    const other = tasks.find(t => t.id !== selfId && t.status === 'In progress' && (t.employees || []).some(e => e.id === id));
+    if (other) {
+      const l = getLabour(id);
+      out.push({ name: l ? l.name : id, work: other });
+    }
+  });
+  return out;
+}
+
+function showTaskConflict(conflicts, starting) {
+  const lines = conflicts.map(c =>
+    '&bull; <b>' + escHtml(c.name) + '</b> is already working in <b>' + escHtml(c.work.description) + '</b> (' + escHtml(c.work.location) + ')'
+  ).join('<br>');
+  const works = [...new Set(conflicts.map(c => c.work.id))];
+  showInfo(
+    starting ? 'This work cannot be started yet' : 'Employee is already on another work',
+    lines + '<br><br>An employee can be in only one <b>work in progress</b> at a time. ' +
+    'Mark that work as <b>completed</b> (or remove the employee from it) first, then try again.',
+    starting && works.length === 1 ? works[0] : null,
+    'Open that work'
+  );
+}
+
+function taskOrder(arr) {
+  return taskSort.value === 'old' ? [...arr] : [...arr].reverse();   // arrays are in the order works were added
+}
+
+function taskSortChanged() {
+  try { localStorage.setItem('workOrder', taskSort.value); } catch (e) {}
+  taskPage = 1;
+  renderTasks();
+}
+
+
+// What is still missing before a work may be marked completed:
+// a photo, and an attendance entry (0 / A counts) for every employee on every date.
+function taskCompletionGaps(t, photoCount) {
+  const idx = taskAttIndex();
+  const dates = taskDates(t);
+  const missing = [];
+  (t.employees || []).forEach(e => {
+    const n = dates.filter(d => String(idx.get(e.id + '|' + d) || '').trim() === '').length;
+    if (n) {
+      const l = getLabour(e.id);
+      missing.push({ name: l ? l.name : (e.name || e.id), count: n });
+    }
+  });
+  return { photos: photoCount < 1, missing };
+}
+
+function showCompletionBlock(gaps, workId) {
+  const parts = [];
+  if (gaps.missing.length) {
+    const total = gaps.missing.reduce((n, m) => n + m.count, 0);
+    parts.push('<b>Attendance is not complete.</b> ' + total + (total === 1 ? ' day entry is' : ' day entries are') + ' still empty:<br>' +
+      gaps.missing.slice(0, 6).map(m => '&bull; ' + escHtml(m.name) + ' &ndash; ' + m.count + (m.count === 1 ? ' day' : ' days') + ' empty').join('<br>') +
+      (gaps.missing.length > 6 ? '<br>&bull; and ' + (gaps.missing.length - 6) + ' more employee' + (gaps.missing.length - 6 === 1 ? '' : 's') : '') +
+      '<br>Type <b>0</b> (or <b>A</b>) for a day the employee did not work.');
+  }
+  if (gaps.photos) parts.push('<b>No work photo is uploaded.</b> Add at least one photo of the work.');
+  showInfo('This work cannot be completed yet', parts.join('<br><br>'), workId, 'Open this work');
+}
+
+function setTaskTab(k) {
+  taskTab = k;
+  taskPage = 1;
+  renderTasks();
+}
+
+function taskAttIndex() {
+  const m = new Map();
+  attendance.forEach(a => m.set(a.labourId + '|' + a.date, a.note || a.status || ''));
+  return m;
+}
+
+function taskDates(t) {
+  const out = [];
+  if (!t.startDate || !t.endDate) return out;
+  const d = new Date(t.startDate + 'T00:00:00');
+  const end = new Date(t.endDate + 'T00:00:00');
+  for (let i = 0; d <= end && i < 400; i++) {
+    out.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+
+function taskDateText(d) {
+  const [, m, day] = d.split('-');
+  return Number(day) + ' ' + TASK_MONTHS[Number(m) - 1];
+}
+
+// per employee: attendance on every date of the work, total days, rate and amount
+function taskCalc(t, idx) {
+  idx = idx || taskAttIndex();
+  const dates = taskDates(t);
+  const rows = (t.employees || []).map(e => {
+    const l = getLabour(e.id);
+    const vals = dates.map(d => String(idx.get(e.id + '|' + d) || '').trim());
+    const days = empRound(vals.reduce((sum, v) => sum + attNum(v), 0));
+    const rate = l ? (Number(l.rate) || 0) : 0;
+    return { id: e.id, name: l ? l.name : e.name, vals, days, rate, cost: empRound(days * rate) };
+  });
+  return {
+    dates, rows,
+    totalDays: empRound(rows.reduce((sum, r) => sum + r.days, 0)),
+    totalCost: empRound(rows.reduce((sum, r) => sum + r.cost, 0))
+  };
+}
+
+function taskCardHtml(t, idx) {
+  const taskRO = me && me.role === 'readonly';
+  const c = taskCalc(t, idx);
+  const done = t.status === 'Completed';
+  const n = c.rows.length;
+  const fmt = v => v.toLocaleString('en-IN');
+
+  let head = '<tr><th class="att-name">Labour name</th>';
+  c.dates.forEach(d => {
+    const sun = new Date(d + 'T00:00:00').getDay() === 0;
+    const [, m, day] = d.split('-');
+    head += `<th class="${sun ? 'att-sun' : ''}">${Number(day)}<small>${TASK_MONTHS[Number(m) - 1]}</small></th>`;
+  });
+  head += '<th class="att-total">Total days</th><th>Rate</th>' + (done ? '<th class="att-total">Amount</th>' : '') + '</tr>';
+
+  const body = n ? c.rows.map(r => {
+    let tr = `<tr data-rate="${r.rate}"><td class="att-name">${escHtml(r.name)}</td>`;
+    r.vals.forEach((v, i) => {
+      const sun = new Date(c.dates[i] + 'T00:00:00').getDay() === 0;
+      tr += `<td class="${sun ? 'att-sun-col' : ''}"><input value="${escHtml(v)}" inputmode="decimal" maxlength="5" data-id="${escHtml(t.id)}" data-e="${escHtml(r.id)}" data-d="${c.dates[i]}" oninput="taskCellInput(this)" onchange="taskCellSave(this)" ${taskRO ? 'disabled' : ''}></td>`;
+    });
+    tr += `<td class="att-total w-days">${r.days}</td><td>${r.rate ? fmt(r.rate) : '-'}</td>`;
+    if (done) tr += `<td class="w-amt">${fmt(r.cost)}</td>`;
+    return tr + '</tr>';
+  }).join('') : `<tr><td class="empty" colspan="${c.dates.length + 3 + (done ? 1 : 0)}">No employees added.</td></tr>`;
+
+  const foot = n ? `<tfoot><tr><td class="att-name">Total</td><td colspan="${c.dates.length}"></td><td class="att-total w-fdays">${c.totalDays}</td><td></td>${done ? `<td class="w-amt w-famt">${fmt(c.totalCost)}</td>` : ''}</tr></tfoot>` : '';
+
+  const photos = (t.photos || []).map((src, i) =>
+    `<div class="photo-thumb" data-id="${escHtml(t.id)}" data-i="${i}" onclick="openTaskPhoto(this.dataset.id, +this.dataset.i)"><img src="${escHtml(src)}" alt="Work photo ${i + 1}"></div>`
+  ).join('');
+
+  let move = '';
+  if (t.status === 'To be started') move = `<button class="btn-primary" data-id="${escHtml(t.id)}" onclick="setTaskStatus(this.dataset.id, 'In progress')">Start work</button>`;
+  if (t.status === 'In progress') move = `<button class="btn-primary" data-id="${escHtml(t.id)}" onclick="setTaskStatus(this.dataset.id, 'Completed')">Mark completed</button>`;
+
+  return `
+    <div class="work-card" id="work_${escHtml(t.id)}">
+      <div class="work-head">
+        <div>
+          <h4>${escHtml(t.description)} ${taskStatusBadge(t.status)}</h4>
+          <div class="work-meta">
+            <span><b>Location:</b> ${escHtml(t.location)}</span>
+            <span><b>Start:</b> ${fmtDate(t.startDate)}</span>
+            <span><b>End:</b> ${fmtDate(t.endDate)}</span>
+            <span><b>Employees:</b> ${n}</span>
+          </div>
+        </div>
+        <div class="work-actions">
+          ${move}
+          <button class="btn-dl icon-btn" title="Download report" aria-label="Download report" data-id="${escHtml(t.id)}" onclick="downloadTaskExcel(this.dataset.id)">${ICON_DL}</button>
+          <button class="btn-edit icon-btn" title="Edit" aria-label="Edit" data-id="${escHtml(t.id)}" onclick="editTask(this.dataset.id)">${ICON_EDIT}</button>
+          <button class="btn-delete icon-btn" title="Delete" aria-label="Delete" data-id="${escHtml(t.id)}" onclick="deleteTask(this.dataset.id)">${ICON_DEL}</button>
+        </div>
+      </div>
+      ${photos ? `<div class="work-photos">${photos}</div>` : ''}
+      <div class="att-wrap">
+        <table class="att-grid work-grid">
+          <thead>${head}</thead>
+          <tbody>${body}</tbody>
+          ${foot}
+        </table>
+      </div>
+      ${done ? `<div class="work-total"><div class="k">Total cost of work<small>${c.totalDays} total days &middot; ${n} employee${n === 1 ? '' : 's'}</small></div><div class="v">${fmt(c.totalCost)}</div></div>` : ''}
+    </div>`;
+}
+
+
+// ---------- attendance typed inside a work ----------
+// writes straight into the Attendance records (same data the Attendance tab uses)
+function taskCellInput(inp) {
+  inp.value = inp.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1');
+  taskRecalcCard(inp.closest('.work-card'));
+}
+
+function taskCellSave(inp) {
+  const t = tasks.find(x => x.id === inp.dataset.id);
+  if (!t) return;
+  const labourId = inp.dataset.e;
+  const date = inp.dataset.d;
+  const emp = (t.employees || []).find(x => x.id === labourId);
+  const l = getLabour(labourId);
+  const name = l ? l.name : (emp ? emp.name : labourId);
+  const note = inp.value.trim();
+  attendance = attendance.filter(a => !(a.labourId === labourId && a.date === date));
+  if (note !== '') attendance.push({ labourId, name, date, note, workId: t.id });
+  delete attDraft[labourId + '|' + date];
+  save('attendance', attendance);
+  notify('Attendance saved');
+  taskRecalcCard(inp.closest('.work-card'));
+}
+
+// update days / amount / totals on screen without redrawing (keeps the cursor in place)
+function taskRecalcCard(card) {
+  if (!card) return;
+  const rows = card.querySelectorAll('tbody tr[data-rate]');
+  let totalDays = 0, totalCost = 0;
+  rows.forEach(tr => {
+    let days = 0;
+    tr.querySelectorAll('input').forEach(i => { days += attNum(i.value); });
+    days = empRound(days);
+    const cost = empRound(days * Number(tr.dataset.rate));
+    tr.querySelector('.w-days').textContent = days;
+    const a = tr.querySelector('.w-amt');
+    if (a) a.textContent = cost.toLocaleString('en-IN');
+    totalDays += days;
+    totalCost += cost;
+  });
+  totalDays = empRound(totalDays);
+  totalCost = empRound(totalCost);
+  const fd = card.querySelector('.w-fdays');
+  if (fd) fd.textContent = totalDays;
+  const fa = card.querySelector('.w-famt');
+  if (fa) fa.textContent = totalCost.toLocaleString('en-IN');
+  const tv = card.querySelector('.work-total .v');
+  if (tv) tv.textContent = totalCost.toLocaleString('en-IN');
+  const ts = card.querySelector('.work-total small');
+  if (ts) ts.textContent = totalDays + ' total days \u00b7 ' + rows.length + ' employee' + (rows.length === 1 ? '' : 's');
+}
+
+// the work that owns an attendance record (only while that work still covers the labour and the date)
+function attLockOwner(rec) {
+  if (!rec || !rec.workId) return null;
+  const t = tasks.find(x => x.id === rec.workId);
+  if (!t) return null;
+  if (rec.date < t.startDate || rec.date > t.endDate) return null;
+  if (!(t.employees || []).some(e => e.id === rec.labourId)) return null;
+  return t;
+}
+
+function attLockedClick(inp) {
+  const t = tasks.find(x => x.id === inp.dataset.w);
+  if (!t) return;
+  const [labourId, date] = inp.dataset.k.split('|');
+  const l = getLabour(labourId);
+  showInfo('Attendance is locked',
+    'Attendance for <b>' + escHtml(l ? l.name : labourId) + '</b> on <b>' + fmtDate(date) + '</b> was added from ' +
+    '<b>Work and Task &rarr; ' + escHtml(t.description) + '</b> (' + escHtml(t.location) + ').<br><br>' +
+    'So that both places always show the same attendance, it can only be changed from that work. ' +
+    'Click <b>Open this work</b> and update it in the work table.',
+    t.id);
+}
+
+function attLockedKey(e, inp) {
+  if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') {
+    e.preventDefault();
+    attLockedClick(inp);
+  }
+}
+
+function showInfo(title, html, workId, btnLabel) {
+  infoTitle.textContent = title;
+  infoBody.innerHTML = html;
+  infoGo.textContent = btnLabel || 'Open this work';
+  infoGo.style.display = workId ? '' : 'none';
+  infoGo.onclick = workId ? () => goToWork(workId) : null;
+  infoModal.classList.add('open');
+}
+
+function closeInfo() {
+  infoModal.classList.remove('open');
+}
+
+function goToWork(id) {
+  closeInfo();
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  showSection('taskSection', document.querySelector('.nav-btn[onclick*="taskSection"]'));
+  taskSearch.value = '';
+  taskTab = Object.keys(TASK_TAB_STATUS).find(k => TASK_TAB_STATUS[k] === t.status) || 'new';
+  const list = taskOrder(tasks.filter(x => x.status === t.status));
+  taskPage = Math.floor(list.findIndex(x => x.id === id) / TASK_CARDS_PER_PAGE) + 1;
+  renderTasks();
+  const el = document.getElementById('work_' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setTaskStatus(id, status) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  if (status === 'In progress') {
+    const clash = taskConflicts((t.employees || []).map(e => e.id), t.id, null);
+    if (clash.length) return showTaskConflict(clash, true);
+  }
+  if (status === 'Completed') {
+    const gaps = taskCompletionGaps(t, (t.photos || []).length);
+    if (gaps.photos || gaps.missing.length) return showCompletionBlock(gaps, t.id);
+  }
+  t.status = status;
+  save('tasks', tasks);
+  taskPage = 1;
+  renderTasks();
+  notify('Moved to ' + TASK_STATUS_LABEL[status]);
+}
+
+// ---------- popup form + photos ----------
+function openTaskForm() {
+  clearTask();
+  taskStatus.value = TASK_TAB_STATUS[taskTab];
+  taskModal.classList.add('open');
+  taskDesc.focus();
+}
+
+function closeTaskForm() {
+  taskModal.classList.remove('open');
+  taskPickClose();
+  clearTask();
+}
+
+function renderTaskPhotoGrid() {
+  if (typeof taskPhotoGrid === 'undefined') return;
+  taskPhotoGrid.innerHTML = taskPhotos.map((src, i) =>
+    `<div class="photo-thumb"><img src="${escHtml(src)}" alt="Work photo ${i + 1}" onclick="openPhotoViewer(taskPhotos, ${i})"><button type="button" class="px" title="Remove" onclick="removeTaskPhoto(${i})">&times;</button></div>`
+  ).join('');
+  taskPhotoHint.textContent = taskPhotos.length
+    ? taskPhotos.length + ' of ' + TASK_MAX_PHOTOS + ' photos added'
+    : 'No photos added (up to ' + TASK_MAX_PHOTOS + ')';
+}
+
+function removeTaskPhoto(i) {
+  taskPhotos.splice(i, 1);
+  renderTaskPhotoGrid();
+}
+
+// shrink the picture so the database does not get heavy
+function taskCompressImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 800;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(img.width * scale));
+      cv.height = Math.max(1, Math.round(img.height * scale));
+      const cx = cv.getContext('2d');
+      cx.fillStyle = '#fff';
+      cx.fillRect(0, 0, cv.width, cv.height);
+      cx.drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL('image/jpeg', 0.6));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); };
+    img.src = url;
+  });
+}
+
+async function addTaskPhotos(input) {
+  const files = [...input.files];
+  input.value = '';
+  for (const f of files) {
+    if (taskPhotos.length >= TASK_MAX_PHOTOS) {
+      alert('You can add up to ' + TASK_MAX_PHOTOS + ' photos for one work.');
+      break;
+    }
+    if (!f.type.startsWith('image/')) { alert(f.name + ' is not a picture.'); continue; }
+    try {
+      taskPhotos.push(await taskCompressImage(f));
+    } catch (e) {
+      alert('Could not open ' + f.name + '. Please use a JPG or PNG photo.');
+    }
+  }
+  renderTaskPhotoGrid();
+}
+
+let pvList = [], pvIdx = 0;
+function openTaskPhoto(id, i) {
+  const t = tasks.find(x => x.id === id);
+  if (t) openPhotoViewer(t.photos || [], i);
+}
+function openPhotoViewer(list, i) {
+  if (!list.length) return;
+  pvList = list;
+  pvIdx = i;
+  showPhoto();
+  photoViewer.classList.add('open');
+}
+function showPhoto() {
+  pvImg.src = pvList[pvIdx];
+  pvPrev.style.display = pvNext.style.display = pvList.length > 1 ? '' : 'none';
+}
+function stepPhoto(d) {
+  pvIdx = (pvIdx + d + pvList.length) % pvList.length;
+  showPhoto();
+}
+function closePhotoViewer() {
+  photoViewer.classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if (typeof photoViewer === 'undefined') return;
+  if (photoViewer.classList.contains('open')) {
+    if (e.key === 'Escape') closePhotoViewer();
+    if (e.key === 'ArrowLeft') stepPhoto(-1);
+    if (e.key === 'ArrowRight') stepPhoto(1);
+  } else if (e.key === 'Escape' && infoModal.classList.contains('open')) {
+    closeInfo();
+  } else if (e.key === 'Escape' && taskModal.classList.contains('open')) {
+    closeTaskForm();
+  }
+});
+
+// Excel report for one task: labour name, every date, total days, rate (and amount when completed)
+function downloadTaskExcel(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  const c = taskCalc(t);
+  const done = t.status === 'Completed';
+  const rows = [
+    ['Task report', ''],
+    ['Task', t.description],
+    ['Location', t.location],
+    ['Start date', fmtDate(t.startDate)],
+    ['End date', fmtDate(t.endDate)],
+    ['Status', TASK_STATUS_LABEL[t.status] || t.status],
+    ['Total employees', c.rows.length],
+    ['Total days', c.totalDays]
+  ];
+  if (done) rows.push(['Total cost of work', c.totalCost]);
+  rows.push(['', '']);
+  const headRow = rows.length;
+  rows.push(['Labour name', ...c.dates.map(taskDateText), 'Total days', 'Rate', ...(done ? ['Amount'] : [])]);
+  c.rows.forEach(r => rows.push([
+    r.name,
+    ...r.vals.map(v => v === '' ? '' : (isNaN(Number(v)) ? v : Number(v))),
+    r.days, r.rate, ...(done ? [r.cost] : [])
+  ]));
+  const totalRow = rows.length;
+  rows.push(['Total', ...c.dates.map(() => ''), c.totalDays, '', ...(done ? [c.totalCost] : [])]);
+  const widths = [26, ...c.dates.map(() => 8), 12, 10, ...(done ? [14] : [])];
+  saveXlsxFile(makeXlsx(rows, widths, [0, headRow, totalRow]),
+    'Task_' + t.description.trim().replace(/\s+/g, '_') + '_' + t.startDate + '.xlsx');
+}
+
+const WK_PER_PAGE = 10;
+let wkPage = 1;
+let wkDraft = {};   // unsaved amounts, key "labourId|YYYY-MM-DD" -> text
+
+function wkSundays(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const days = new Date(y, m, 0).getDate();
+  const out = [];
+  for (let d = 1; d <= days; d++) {
+    if (new Date(y, m - 1, d).getDay() === 0) out.push(ym + '-' + String(d).padStart(2, '0'));
+  }
+  return out;
+}
+
+function wkNoteFor(labourId, date) {
+  const key = labourId + '|' + date;
+  if (key in wkDraft) return wkDraft[key];
+  const ex = weeklyPays.find(w => w.labourId === labourId && w.date === date);
+  return ex ? String(ex.amount == null ? '' : ex.amount) : '';
+}
+
+function wkUpdateStats() {
+  const ym = weekMonth.value;
+  const suns = wkSundays(ym);
+  const today = todayStr();
+  let given = 0;
+  labours.forEach(l => suns.forEach(d => { given += attNum(wkNoteFor(l.id, d)); }));
+
+  // Pending = employees whose weekly amount is not SAVED yet, for every Sunday up to the current week.
+  let target = suns.find(d => d >= today);
+  if (!target) target = today > ym + '-31' ? suns[suns.length - 1] : suns[0];
+  const due = suns.filter(d => d <= target);
+  let pending = 0;
+  labours.forEach(l => {
+    const unpaid = due.some(d => !weeklyPays.some(w => w.labourId === l.id && w.date === d && Number(w.amount) > 0));
+    if (unpaid) pending++;
+  });
+  wkStatPaid.textContent = (labours.length - pending).toLocaleString('en-IN');   // everyone who is not pending
+  wkStatGiven.textContent = (Math.round(given * 100) / 100).toLocaleString('en-IN');
+  wkStatPending.textContent = pending.toLocaleString('en-IN');
+}
+
+function wkCellInput(inp) {
+  inp.value = inp.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1');
+  wkDraft[inp.dataset.k] = inp.value;
+  const row = inp.closest('tr');
+  row.querySelector('.att-total').textContent = attRowTotal(row);
+  wkUpdateStats();
+}
+
+function goWkPage(n) {
+  wkPage = n;
+  renderWeekly();
+}
+
+function renderWeekly() {
+  if (!weekMonth.value) {
+    const now = new Date();
+    weekMonth.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  }
+  const ym = weekMonth.value;
+  const suns = wkSundays(ym);
+  const readOnly = me && me.role === 'readonly';
+
+  weekHead.innerHTML = '<tr><th class="att-name">Name</th>' +
+    suns.map(d => `<th class="att-sun">${fmtDate(d)}</th>`).join('') +
+    '<th class="att-total">Kharchi</th></tr>';
+
+  const cols = suns.length + 2;
+  if (!labours.length) {
+    weeklyTable.innerHTML = `<tr><td colspan="${cols}" class="empty">Add employee first.</td></tr>`;
+    weekPager.innerHTML = '';
+    wkUpdateStats();
+    return;
+  }
+
+  const q = (weekSearch.value || '').trim().toLowerCase();
+  const list = labours.filter(l => !q || String(l.name).toLowerCase().includes(q));
+  if (!list.length) {
+    weeklyTable.innerHTML = `<tr><td colspan="${cols}" class="empty">No employees match your search.</td></tr>`;
+    weekPager.innerHTML = '';
+    wkUpdateStats();
+    return;
+  }
+
+  const pages = Math.ceil(list.length / WK_PER_PAGE);
+  if (wkPage > pages) wkPage = pages;
+  if (wkPage < 1) wkPage = 1;
+  const start = (wkPage - 1) * WK_PER_PAGE;
+  const pageList = list.slice(start, start + WK_PER_PAGE);
+
+  weeklyTable.innerHTML = pageList.map(l => {
+    let total = 0;
+    const cells = suns.map(d => {
+      const key = l.id + '|' + d;
+      const note = wkNoteFor(l.id, d);
+      total += attNum(note);
+      return `<td class="wk-cell"><input data-k="${escHtml(key)}" value="${escHtml(note)}" inputmode="decimal" maxlength="9" oninput="wkCellInput(this)" ${readOnly ? 'disabled' : ''}></td>`;
+    }).join('');
+    total = Math.round(total * 100) / 100;
+    return `<tr><td class="att-name">${escHtml(l.name)}</td>${cells}<td class="att-total">${total}</td></tr>`;
+  }).join('');
+
+  const from = start + 1;
+  const to = start + pageList.length;
+  weekPager.innerHTML = `
+    <div class="pager-info">Showing ${from}-${to} of ${list.length}</div>
+    <div class="pager-btns">
+      <button class="pager-btn" onclick="goWkPage(${wkPage - 1})" ${wkPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>
+      <button class="pager-btn active" disabled>${wkPage}</button>
+      <span class="pager-gap">of ${pages}</span>
+      <button class="pager-btn" onclick="goWkPage(${wkPage + 1})" ${wkPage === pages ? 'disabled' : ''}>Next &raquo;</button>
+    </div>`;
+  wkUpdateStats();
+}
+
+function saveWeekly() {
+  const keys = Object.keys(wkDraft);
+  if (!keys.length) return notify('No changes to save');
+  const bad = keys.find(k => {
+    const v = String(wkDraft[k]).trim();
+    return v !== '' && !/^\d+(\.\d+)?$/.test(v);
+  });
+  if (bad) return alert('Amounts can contain only numbers. Please fix the highlighted entry, e.g. "5." or ".".');
+  keys.forEach(k => {
+    const [labourId, date] = k.split('|');
+    const l = getLabour(labourId);
+    if (!l) return;
+    const amount = String(wkDraft[k]).trim();
+    weeklyPays = weeklyPays.filter(w => !(w.labourId === labourId && w.date === date));
+    if (amount !== '' && Number(amount) > 0) {
+      weeklyPays.push({ labourId, name: l.name, rate: l.rate || '', amount, date });
+    }
+  });
+  wkDraft = {};
+  save('weeklyPays', weeklyPays);
+  notify('Weekly expenditure saved');
+  renderWeekly();
+}
+
+function downloadWeeklyExcel() {
+  if (!labours.length) return alert('No employees to download yet.');
+  const ym = weekMonth.value;
+  if (!ym) return alert('Select a month first.');
+  const suns = wkSundays(ym);
+  const rows = [['Name', ...suns.map(fmtDate), 'KHARCHI']];
+  const colTotals = suns.map(() => 0);
+  let grand = 0;
+  labours.forEach(l => {
+    const row = [l.name];
+    let total = 0;
+    suns.forEach((d, i) => {
+      const note = String(wkNoteFor(l.id, d)).trim();
+      if (note === '') { row.push(''); return; }
+      const n = attNum(note);
+      row.push(n);
+      total += n;
+      colTotals[i] += n;
+    });
+    total = Math.round(total * 100) / 100;
+    grand += total;
+    row.push(total);
+    rows.push(row);
+  });
+  rows.push(['TOTAL', ...colTotals.map(v => Math.round(v * 100) / 100), Math.round(grand * 100) / 100]);
+  const widths = [26, ...suns.map(() => 14), 12];
+  const blob = makeXlsx(rows, widths, [0, rows.length - 1]);
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'Weekly_Expenditure_' + ym + '.xlsx';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
+
+function weeklyPaidFor(labourId, ym) {
+  return weeklyPays
+    .filter(w => w.labourId === labourId && (!ym || (w.date && w.date.startsWith(ym))))
+    .reduce((sum, w) => sum + (Number(w.amount) || 0), 0);
+}
+
+function advancePaidFor(labourId, ym) {
+  return advances
+    .filter(a => a.labourId === labourId && (!ym || (a.date && a.date.startsWith(ym))))
+    .reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+}
+
+// Total attendance for the month = the sum of the daily values (e.g. 30.5), exactly the
+// "Total" shown on the Attendance grid. It is not a count of days worked.
+function daysWorkedInMonth(labourId, dateStr) {
+  if (!labourId || !dateStr) return 0;
+  const ym = dateStr.slice(0, 7);
+  const perDate = {};
+  attendance.forEach(a => {
+    if (a.labourId === labourId && a.date && a.date.startsWith(ym)) perDate[a.date] = a.note || a.status || '';
+  });
+  const total = Object.values(perDate).reduce((t, n) => t + attNum(n), 0);
+  return Math.round(total * 100) / 100;
+}
+
+function resetMonthlyCalc() {
+  monthTotal.value = '';
+  monthWeeklyPaid.value = '';
+  monthGrand.value = '';
+  monthAdvance.value = '';
+  monthPayable.value = '';
+}
+
+function fillMonthlyDays() {
+  const l = getLabour(monthLabour.value);
+  resetMonthlyCalc();
+  if (!l || !monthDate.value) {
+    monthDays.value = '';
+    return;
+  }
+  monthDays.value = daysWorkedInMonth(l.id, monthDate.value);
+}
+
+function fillMonthlyLabour() {
+  const l = getLabour(monthLabour.value);
+  monthRate.value = l ? (l.rate || '') : '';
+  fillMonthlyDays();
+}
+
+function calcMonthly() {
+  const l = getLabour(monthLabour.value);
+  if (!l) return alert('Select employee');
+  if (!monthDate.value) return alert('Select a date');
+  const days = daysWorkedInMonth(l.id, monthDate.value);
+  const rate = Number(l.rate || monthRate.value) || 0;
+  const ym = monthDate.value.slice(0, 7);
+  const weeklyPaid = weeklyPaidFor(l.id, ym);
+  const advancePaid = advancePaidFor(l.id, ym);
+  const total = Math.round(days * rate * 100) / 100;
+  const grand = total - weeklyPaid;
+  monthRate.value = l.rate || '';
+  monthDays.value = days;
+  monthWeeklyPaid.value = weeklyPaid;
+  monthTotal.value = total;
+  monthGrand.value = grand;
+  monthAdvance.value = advancePaid;
+  monthPayable.value = grand - advancePaid;
+}
+
+function clearMonthly() {
+  monthLabour.value = '';
+  monthPicker.sync();
+  monthRate.value = '';
+  monthDays.value = '';
+  resetMonthlyCalc();
+}
+
+function saveMonthly() {
+  const l = getLabour(monthLabour.value);
+  if (!l) return alert('Select employee');
+  if (!monthDate.value) return alert('Select a date');
+  if (monthGrand.value === '') return alert('Click Calculate first');
+  monthlyPays.push({
+    labourId: l.id,
+    name: l.name,
+    date: monthDate.value,
+    month: monthDate.value.slice(0, 7),
+    rate: monthRate.value,
+    days: monthDays.value,
+    total: monthTotal.value,
+    weeklyPaid: monthWeeklyPaid.value || 0,
+    grand: monthGrand.value,
+    advancePaid: monthAdvance.value || 0,
+    payable: monthPayable.value
+  });
+  save('monthlyPays', monthlyPays);
+  renderMonthly(true);
+  clearMonthly();
+  notify('Monthly expenditure saved');
+}
+
+// Blocks on top of Monthly Expenditure (current month by system date):
+// paid = employees with a saved monthly expenditure for this month, pending = everyone else,
+// amount = the payable amount of those saved entries
+function updateMonthlyStats() {
+  if (typeof monStatPaid === 'undefined') return;
+  const ym = todayStr().slice(0, 7);
+  const recs = monthlyPays.filter(m => (m.month || String(m.date || '').slice(0, 7)) === ym);
+  const paidIds = new Set(recs.map(m => m.labourId));
+  const paid = labours.filter(l => paidIds.has(l.id)).length;
+  const amount = recs.reduce((t, m) => t + Math.max(0, Number(m.payable) || 0), 0);
+  monStatPaid.textContent = paid.toLocaleString('en-IN');
+  monStatPending.textContent = (labours.length - paid).toLocaleString('en-IN');
+  monStatAmount.textContent = (Math.round(amount * 100) / 100).toLocaleString('en-IN');
+}
+
+function renderMonthly(highlightLast) {
+  updateMonthlyStats();
+  if (!monthlyPays.length) {
+    monthlyTable.innerHTML = '<tr><td colspan="9" class="empty">No monthly expenditure yet.</td></tr>';
+    return;
+  }
+  monthlyTable.innerHTML = monthlyPays.map((m, i) => `
+    <tr class="${highlightLast && i === monthlyPays.length - 1 ? 'row-new' : ''}">
+      <td>${m.name}</td>
+      <td>${m.month || (m.date ? m.date.slice(0, 7) : '-')}</td>
+      <td>${m.rate}</td>
+      <td>${m.days}</td>
+      <td>${m.total}</td>
+      <td>${m.weeklyPaid}</td>
+      <td>${m.grand}</td>
+      <td>${m.advancePaid != null ? m.advancePaid : '-'}</td>
+      <td><strong>${m.payable != null ? m.payable : '-'}</strong></td>
+    </tr>`).join('');
+}
+
+
+// ================= ALL REPORT =================
+// Each builder returns a sheet { name, rows, widths, bold } so it can be downloaded
+// alone or bundled with the others into one workbook.
+function rpNum(v) {
+  return (v !== '' && v != null && !isNaN(Number(v))) ? Number(v) : (v == null ? '' : v);
+}
+
+function rpEmployeesSheet(ym) {
+  const ctx = empBuildCtx(ym);
+  const rows = [[
+    'Employee ID', 'Name', 'Profession',
+    ...ctx.dayKeys.map((d, i) => String(i + 1)),
+    'Days total', 'Rate', 'Total',
+    ...ctx.sundays.map(fmtDate),
+    'Kharchi', 'Advance by', 'Advance', 'Grand total'
+  ]];
+  let tWages = 0, tKharchi = 0, tAdv = 0, tAmount = 0;
+  labours.forEach(l => {
+    const r = empRowData(l, ctx);
+    tWages += r.wages; tKharchi += r.kharchi; tAdv += r.advAmt; tAmount += r.amount;
+    const rateNum = Number(r.rate);
+    rows.push([
+      l.id, l.name, l.profession || '',
+      ...r.dayNotes.map(n => n === '' ? '' : (isNaN(Number(n)) ? n : Number(n))),
+      r.attTotal, r.rate !== '' && !isNaN(rateNum) ? rateNum : r.rate, r.wages,
+      ...r.sundayAmts.map(v => v ? empRound(v) : ''),
+      r.kharchi, r.advBy, r.advAmt || '', r.amount
+    ]);
+  });
+  const blank = n => Array(n).fill('');
+  rows.push([
+    '', 'TOTAL', '',
+    ...blank(ctx.days), '', '', empRound(tWages),
+    ...blank(ctx.sundays.length),
+    empRound(tKharchi), '', empRound(tAdv), empRound(tAmount)
+  ]);
+  const widths = [14, 26, 20, ...Array(ctx.days).fill(5), 11, 10, 12, ...Array(ctx.sundays.length).fill(13), 12, 22, 15, 14];
+  return { name: 'Employees', rows, widths, bold: [0, rows.length - 1] };
+}
+
+function rpAttendanceSheet(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const days = new Date(y, m, 0).getDate();
+  const head = ['Name'];
+  for (let d = 1; d <= days; d++) head.push(String(d));
+  head.push('Total');
+  const rows = [head];
+  labours.forEach(l => {
+    const row = [l.name];
+    let total = 0;
+    for (let d = 1; d <= days; d++) {
+      const note = String(attNoteFor(l.id, ym + '-' + String(d).padStart(2, '0'))).trim();
+      if (note === '') { row.push(''); continue; }
+      const n = Number(note);
+      if (isNaN(n)) { row.push(note); continue; }
+      total += n;
+      row.push(n);
+    }
+    row.push(Math.round(total * 100) / 100);
+    rows.push(row);
+  });
+  const widths = [26, ...Array(days).fill(5), 9];
+  return { name: 'Attendance', rows, widths, bold: [0] };
+}
+
+function rpTasksSheet() {
+  const rows = [['Task', 'Location', 'Employees', 'No. of employees', 'Start date', 'End date', 'Days', 'Status', 'Total days worked', 'Total cost']];
+  const idx = taskAttIndex();
+  tasks.forEach(t => {
+    const names = (t.employees || []).map(e => { const l = getLabour(e.id); return l ? l.name : e.name; });
+    const c = taskCalc(t, idx);
+    const done = t.status === 'Completed';
+    rows.push([t.description, t.location || '', names.join(', '), names.length, fmtDate(t.startDate), fmtDate(t.endDate), taskDaysText(t),
+      TASK_STATUS_LABEL[t.status] || t.status || '', c.totalDays, done ? c.totalCost : '']);
+  });
+  return { name: 'Work and Task', rows, widths: [30, 22, 44, 16, 13, 13, 18, 18, 18, 14], bold: [0] };
+}
+
+function rpAdvancesSheet() {
+  const rows = [['Date', 'Name', 'Rate', 'Amount', 'Paid by', 'Mode']];
+  let total = 0;
+  advances.forEach(a => {
+    const amt = Number(a.amount);
+    if (!isNaN(amt)) total += amt;
+    rows.push([fmtDate(a.date), a.name, rpNum(a.rate), rpNum(a.amount), a.paidBy || '', a.mode || '']);
+  });
+  rows.push(['', 'Total', '', Math.round(total * 100) / 100, '', '']);
+  return { name: 'Advance Payments', rows, widths: [14, 28, 12, 14, 20, 12], bold: [0, rows.length - 1] };
+}
+
+function rpWeeklySheet(ym) {
+  const suns = wkSundays(ym);
+  const rows = [['Name', ...suns.map(fmtDate), 'KHARCHI']];
+  const colTotals = suns.map(() => 0);
+  let grand = 0;
+  labours.forEach(l => {
+    const row = [l.name];
+    let total = 0;
+    suns.forEach((d, i) => {
+      const note = String(wkNoteFor(l.id, d)).trim();
+      if (note === '') { row.push(''); return; }
+      const n = attNum(note);
+      row.push(n);
+      total += n;
+      colTotals[i] += n;
+    });
+    total = Math.round(total * 100) / 100;
+    grand += total;
+    row.push(total);
+    rows.push(row);
+  });
+  rows.push(['TOTAL', ...colTotals.map(v => Math.round(v * 100) / 100), Math.round(grand * 100) / 100]);
+  return { name: 'Weekly Expenditure', rows, widths: [26, ...suns.map(() => 14), 12], bold: [0, rows.length - 1] };
+}
+
+function rpMonthlySheet() {
+  const rows = [['Name', 'Month', 'Rate', 'Days', 'Total', 'Weekly paid', 'Grand total', 'Advance paid', 'Amount to be paid']];
+  const sum = { total: 0, weekly: 0, grand: 0, adv: 0, pay: 0 };
+  monthlyPays.forEach(m => {
+    sum.total += Number(m.total) || 0;
+    sum.weekly += Number(m.weeklyPaid) || 0;
+    sum.grand += Number(m.grand) || 0;
+    sum.adv += Number(m.advancePaid) || 0;
+    sum.pay += Number(m.payable) || 0;
+    rows.push([m.name, m.month || (m.date ? m.date.slice(0, 7) : ''), rpNum(m.rate), rpNum(m.days), rpNum(m.total),
+      rpNum(m.weeklyPaid), rpNum(m.grand), rpNum(m.advancePaid), rpNum(m.payable)]);
+  });
+  const r2 = v => Math.round(v * 100) / 100;
+  rows.push(['TOTAL', '', '', '', r2(sum.total), r2(sum.weekly), r2(sum.grand), r2(sum.adv), r2(sum.pay)]);
+  return { name: 'Monthly Expenditure', rows, widths: [26, 11, 10, 10, 13, 13, 14, 14, 18], bold: [0, rows.length - 1] };
+}
+
+function rpMonth() {
+  const ym = reportMonth.value;
+  if (!ym) { alert('Select a report month first.'); return ''; }
+  return ym;
+}
+
+function updateReportCounts() {
+  if (typeof rpCountEmp === 'undefined') return;
+  const ym = reportMonth.value;
+  const plural = (n, w) => n.toLocaleString('en-IN') + ' ' + w + (n === 1 ? '' : 's');
+  rpCountEmp.textContent = plural(labours.length, 'employee');
+  rpCountAtt.textContent = plural(labours.length, 'employee');
+  rpCountTask.textContent = plural(tasks.length, 'task');
+  rpCountAdv.textContent = plural(advances.length, 'payment');
+  rpCountWk.textContent = ym ? plural(weeklyPays.filter(w => w.date && w.date.startsWith(ym)).length, 'payment') : '-';
+  rpCountMon.textContent = plural(monthlyPays.length, 'record');
+}
+
+function downloadEmployeesReport() {
+  if (!labours.length) return alert('No employees to download yet.');
+  const ym = rpMonth(); if (!ym) return;
+  const sh = rpEmployeesSheet(ym);
+  saveXlsxFile(makeXlsxBook([sh]), 'Employees_' + ym + '.xlsx');
+}
+
+function downloadAttendanceReport() {
+  if (!labours.length) return alert('No employees to download yet.');
+  const ym = rpMonth(); if (!ym) return;
+  saveXlsxFile(makeXlsxBook([rpAttendanceSheet(ym)]), 'Attendance_' + ym + '.xlsx');
+}
+
+function downloadTasksReport() {
+  if (!tasks.length) return alert('No tasks to download yet.');
+  saveXlsxFile(makeXlsxBook([rpTasksSheet()]), 'Work_and_Task_' + todayStr() + '.xlsx');
+}
+
+function downloadAdvancesReport() {
+  if (!advances.length) return alert('No advance payments to download yet.');
+  saveXlsxFile(makeXlsxBook([rpAdvancesSheet()]), 'Advance_Payments_' + todayStr() + '.xlsx');
+}
+
+function downloadWeeklyReport() {
+  if (!labours.length) return alert('No employees to download yet.');
+  const ym = rpMonth(); if (!ym) return;
+  saveXlsxFile(makeXlsxBook([rpWeeklySheet(ym)]), 'Weekly_Expenditure_' + ym + '.xlsx');
+}
+
+function downloadMonthlyReport() {
+  if (!monthlyPays.length) return alert('No monthly expenditure to download yet.');
+  saveXlsxFile(makeXlsxBook([rpMonthlySheet()]), 'Monthly_Expenditure_' + todayStr() + '.xlsx');
+}
+
+function downloadAllReportsExcel() {
+  const ym = rpMonth(); if (!ym) return;
+  const sheets = [rpEmployeesSheet(ym), rpAttendanceSheet(ym), rpTasksSheet(), rpAdvancesSheet(), rpWeeklySheet(ym), rpMonthlySheet()];
+  saveXlsxFile(makeXlsxBook(sheets), 'All_Reports_' + ym + '.xlsx');
+}
+
+const SLIDE_LIVE_MS = 3000;
+const SLIDE_COMPLETED_MS = SLIDE_LIVE_MS + 2000;   // completed projects stay 2 seconds longer than live projects
+
+// Reusable "search an employee" picker for a hidden <select> (used by Monthly Expenditure)
+function makeEmpPicker(cfg) {
+  const $ = id => document.getElementById(id);
+  let idx = -1;
+  const api = {
+    sync() {
+      const l = getLabour($(cfg.selectId).value);
+      $(cfg.inputId).value = l ? l.name : '';
+    },
+    matches() {
+      const sel = getLabour($(cfg.selectId).value);
+      let q = $(cfg.inputId).value.trim().toLowerCase();
+      if (sel && q === String(sel.name).toLowerCase()) q = '';      // re-opening shows everyone
+      return labours.filter(l => !q || (l.name + ' ' + l.id).toLowerCase().includes(q));
+    },
+    open(typing) {
+      if (!typing) $(cfg.inputId).select();
+      const list = api.matches();
+      idx = list.length ? 0 : -1;
+      $(cfg.listId).innerHTML = list.length
+        ? list.map((l, i) => `<div class="picker-item ${i === 0 ? 'active' : ''}" data-id="${escHtml(l.id)}" onmousedown="event.preventDefault(); ${cfg.name}.choose(this.dataset.id)">${escHtml(l.name)}</div>`).join('')
+        : '<div class="picker-none">No employee found</div>';
+      $(cfg.listId).classList.add('open');
+    },
+    close() {
+      $(cfg.listId).classList.remove('open');
+      api.sync();
+    },
+    choose(id) {
+      $(cfg.selectId).value = id;
+      api.sync();
+      $(cfg.listId).classList.remove('open');
+      $(cfg.inputId).blur();
+      if (cfg.onChange) cfg.onChange();
+    },
+    clear() {
+      $(cfg.selectId).value = '';
+      api.sync();
+      $(cfg.listId).classList.remove('open');
+      if (cfg.onChange) cfg.onChange();
+    },
+    key(e) {
+      const items = [...$(cfg.listId).querySelectorAll('.picker-item')];
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!$(cfg.listId).classList.contains('open')) return api.open();
+        if (!items.length) return;
+        idx = (idx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items.forEach((el, i) => el.classList.toggle('active', i === idx));
+        items[idx].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (items[idx]) api.choose(items[idx].dataset.id);
+      } else if (e.key === 'Escape') {
+        api.close();
+        $(cfg.inputId).blur();
+      }
+    }
+  };
+  document.addEventListener('click', e => {
+    if (!$(cfg.pickerId).contains(e.target)) api.close();
+  });
+  return api;
+}
+
+const monthPicker = makeEmpPicker({
+  name: 'monthPicker', pickerId: 'monthPicker', inputId: 'monthPickInput',
+  listId: 'monthPickList', selectId: 'monthLabour', onChange: () => fillMonthlyLabour()
+});
+
+function makeSlider(imgId, dotsId, list, ms) {
+  let idx = 0;
+  let timer = null;
+  const dotsEl = () => document.getElementById(dotsId);
+
+  function show(i) {
+    idx = (i + list.length) % list.length;
+    document.getElementById(imgId).src = list[idx];
+    dotsEl().querySelectorAll('.dot').forEach((d, k) => d.classList.toggle('active', k === idx));
+  }
+  function restart() {
+    clearInterval(timer);
+    timer = setInterval(() => show(idx + 1), ms);
+  }
+  function start() {
+    if (timer) return;
+    dotsEl().innerHTML = list.map((_, k) =>
+      `<button type="button" class="dot${k === idx ? ' active' : ''}" aria-label="Show photo ${k + 1}"></button>`).join('');
+    dotsEl().querySelectorAll('.dot').forEach((d, k) => { d.onclick = () => { show(k); restart(); }; });
+    restart();
+  }
+  return { start };
+}
+
+const images = ['images_1.jpg', 'images_2.jpg', 'images_3.jpg', 'images_4.jpg', 'images_5.jpg'];
+const completedImages = ['images_2.jpg', 'images_4.jpg', 'images_1.jpg', 'images_5.jpg', 'images_3.jpg'];
+const liveSlider = makeSlider('slideImage', 'slideDots', images, SLIDE_LIVE_MS);
+const completedSlider = makeSlider('completedSlideImage', 'completedSlideDots', completedImages, SLIDE_COMPLETED_MS);
+
+function startSlider() { liveSlider.start(); }
+function startCompletedSlider() { completedSlider.start(); }
+
+</script>
+</body>
+</html>
