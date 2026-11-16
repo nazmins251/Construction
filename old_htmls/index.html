@@ -462,6 +462,7 @@ body.booting #loginPage { display: none !important; }
   gap: 14px;
   margin-bottom: 16px;
 }
+.stats.stats-5 { grid-template-columns: repeat(5, 1fr); }
 
 .stat {
   background: #fff;
@@ -493,6 +494,10 @@ body.booting #loginPage { display: none !important; }
   display: block;
 }
 
+.pay-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.pay-tab { padding: 10px 20px; border-radius: 10px; background: #fff; color: var(--navy); font-weight: 700; border: 1px solid var(--line); }
+.pay-tab:hover { background: #eef4ff; }
+.pay-tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
 .toast {
   position: fixed;
 
@@ -566,6 +571,22 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
 .att-grid.emp-grid td { padding: 8px 9px; font-size: 13px; white-space: nowrap; }
 .att-grid.emp-grid td.att-name { text-align: left; min-width: 190px; }
 .att-grid.emp-grid thead th.att-name { text-align: left; min-width: 190px; }
+.att-grid.emp-grid td.emp-day { padding: 8px 3px; }
+.att-grid.emp-grid td input.emp-att { width: 34px; height: 24px; text-align: center; padding: 0; border: 1px solid transparent; background: transparent; font-size: 13px; border-radius: 6px; }
+.att-grid.emp-grid td input.emp-att:hover { border-color: var(--line); background: #fff; }
+.att-grid.emp-grid td input.emp-att:focus { border-color: var(--navy); background: #fff; outline: none; }
+.att-grid.emp-grid td.att-locked input.emp-att { cursor: pointer; color: var(--navy); font-weight: 700; }
+.btn-complete { background: var(--navy); color: #fff; padding: 0 16px; height: 36px; border-radius: 8px; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.btn-complete:hover { background: var(--navy-2); }
+.work-actions { align-items: center; }
+.btn-edit-emp { background: #e8eefb; color: var(--navy); padding: 11px 18px; border-radius: 8px; font-weight: 600; }
+.btn-edit-emp:hover { background: #d8e2f7; }
+.btn-del-emp { background: #fde8e6; color: #b42318; padding: 11px 18px; border-radius: 8px; font-weight: 600; }
+.btn-del-emp:hover { background: #fbd5d1; }
+/* no up/down arrows in the Extra expenses, Last month balance and Amount paid boxes */
+.att-grid.emp-grid td.c-input input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.att-grid.emp-grid td.c-input input[type=number]::-webkit-outer-spin-button,
+.att-grid.emp-grid td.c-input input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .att-grid.emp-grid .nm { font-weight: 700; }
 .att-grid.emp-grid .sub { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 500; color: var(--muted); }
 .att-grid.emp-grid thead th.g-calc { background: var(--navy-2); }
@@ -670,7 +691,7 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
   .modal-body { grid-template-columns: 1fr; }
   .container { flex-direction: column; }
   .sidebar { width: 100%; height: auto; }
-  .form-grid, .g-labour, .g-wage, .g-week, .g-month, .g-month-2, .g-att, .g-profile, .g-task, .stats {
+  .form-grid, .g-labour, .g-wage, .g-week, .g-month, .g-month-2, .g-att, .g-profile, .g-task, .stats, .stats.stats-5 {
     grid-template-columns: 1fr;
   }
   .g-task .span2, .g-task .span3 { grid-column: auto; }
@@ -708,7 +729,7 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
 .dpr-block .table-wrap { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .dpr-top { margin-bottom: 18px; }
 .dpr-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding: 18px 21px 0; border-top: 1px solid var(--line); }
-.dpr-actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px 24px; border-radius: 10px; font-size: 15px; font-weight: 800; letter-spacing: .2px; }
+.dpr-actions button { display: inline-flex; align-items: center; justify-content: center; width: 165px; height: 48px; padding: 8px 16px; border-radius: 10px; font-size: 15px; font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
 .dpr-actions-left { display: flex; align-items: center; gap: 10px; }
 .dpr-block .table-wrap { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .dpr-works-cell div { white-space: nowrap; }
@@ -753,9 +774,7 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
       <button class="nav-btn" onclick="showSection('attendanceSection', this)">Attendance</button>
       <button class="nav-btn" onclick="showSection('dprSection', this)">Daily Progress Report</button>
       <button class="nav-btn" onclick="showSection('taskSection', this)">Work and Task</button>
-      <button class="nav-btn" onclick="showSection('advanceSection', this)">Advance payment</button>
-      <button class="nav-btn" onclick="showSection('weeklySection', this)">Weekly Expenditure</button>
-      <button class="nav-btn" onclick="showSection('monthlySection', this)">Monthly Expenditure</button>
+      <button class="nav-btn" id="payNav" onclick="showSection('advanceSection', this)">Payments</button>
       <button class="nav-btn" onclick="showSection('reportSection', this)">All Report</button>
     </aside>
 
@@ -872,16 +891,38 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
       </div>
 
       <div id="labourSection" class="section">
-        <div class="stats stats-navy">
+        <div class="stats stats-navy stats-5">
           <div class="stat"><div class="k">Total labours</div><div class="v" id="empStatLabour">0</div></div>
           <div class="stat"><div class="k">Engineers</div><div class="v" id="empStatEngineer">0</div></div>
           <div class="stat"><div class="k">Foreman</div><div class="v" id="empStatExtra">0</div></div>
+          <div class="stat"><div class="k">Supervisor</div><div class="v" id="empStatSupervisor">0</div></div>
           <div class="stat"><div class="k">Total resources</div><div class="v" id="empStatTotal">0</div></div>
         </div>
         <div class="page-head" style="justify-content:flex-end">
           <div class="head-btns">
             <button class="btn-clear keep" onclick="downloadEmployeesExcel()">Download Excel</button>
+            <button class="btn-edit-emp" id="editEmployeeBtn" onclick="openEditEmployee()">Edit employee</button>
+            <button class="btn-del-emp" id="delEmployeeBtn" onclick="openDeleteEmployee()">Delete employee</button>
             <button class="btn-primary" id="addEmployeeBtn" onclick="openEmployeeForm()">+ Add new Employee</button>
+          </div>
+        </div>
+
+        <div class="modal-backdrop" id="deleteEmpModal">
+          <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteEmpTitle">
+            <div class="modal-head">
+              <h4 id="deleteEmpTitle">Delete employee</h4>
+              <button type="button" class="modal-x" title="Close" onclick="closeDeleteEmployee()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="field">
+                <label for="delEmpSelect">Select the employee to delete</label>
+                <select id="delEmpSelect"></select>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn-clear" onclick="closeDeleteEmployee()">Cancel</button>
+              <button class="btn-del-emp" onclick="confirmDeleteEmployee()">Delete</button>
+            </div>
           </div>
         </div>
 
@@ -892,6 +933,10 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
               <button type="button" class="modal-x" title="Close" onclick="closeEmployeeForm()">&times;</button>
             </div>
             <div class="modal-body">
+              <div class="field" id="lpickWrap" style="display:none; grid-column: 1 / -1">
+                <label for="lpick">Select employee to edit</label>
+                <select id="lpick" onchange="pickEmployeeToEdit(this.value)"></select>
+              </div>
               <div class="field">
                 <label>Employee ID</label>
                 <input id="lid" class="readonly" readonly>
@@ -908,15 +953,22 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
                   <div class="picker-list" id="profPickList" onmousedown="profPickPress(event)">
                     <div class="picker-item" data-v="Engineer">Engineer</div>
                     <div class="picker-item" data-v="Foreman">Foreman</div>
+                    <div class="picker-item" data-v="Supervisor">Supervisor</div>
                     <div class="picker-item has-sub" data-v="Labour">Labour<span class="chev">&rsaquo;</span>
                       <div class="sub-menu">
-                        <div class="picker-item" data-v="Plumber">Plumber</div>
-                        <div class="picker-item" data-v="Electrician">Electrician</div>
+                        <div class="picker-item" data-v="Fitter">Fitter</div>
                         <div class="picker-item" data-v="Helper">Helper</div>
+                        <div class="picker-item" data-v="Carpenter">Carpenter</div>
+                        <div class="picker-item" data-v="Mason">Mason</div>
                       </div>
                     </div>
+                    <div class="picker-item" data-v="Other">Other</div>
                   </div>
                 </div>
+              </div>
+              <div class="field" id="lotherWrap" style="display:none">
+                <label>Other - description</label>
+                <input id="lother" placeholder="Enter labour type" maxlength="40" autocomplete="off" oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')">
               </div>
               <div class="field">
                 <label>Rate</label>
@@ -991,7 +1043,7 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
             </div>
             <div class="field">
               <label for="dprSite">Site</label>
-              <input id="dprSite" placeholder="e.g. Hinjewadi Phase 2" maxlength="80"
+              <input id="dprSite" placeholder="e.g. Aurelia" maxlength="80"
                      oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.\-\/]/g, ''); dprDirty = true">
             </div>
           </div>
@@ -1032,6 +1084,7 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
           </div>
         </div>
 
+        <div class="pay-tabs" id="workTabs"></div>
         <div id="taskCards"></div>
         <div class="pager work-pager" id="taskPager"></div>
 
@@ -1175,7 +1228,12 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
         <div class="card">
           <div class="emp-head">
             <h4>Saved advance payments</h4>
-            <button class="btn-clear keep" onclick="downloadAdvancesExcel()">Download Excel</button>
+            <div class="head-btns">
+              <label for="advMonthFilter" class="muted" style="font-weight:700">Month</label>
+              <input type="month" id="advMonthFilter" style="width:180px" onchange="advPage = 1; renderAdvances()">
+              <button class="btn-clear keep" onclick="advMonthFilter.value = ''; advPage = 1; renderAdvances()">All months</button>
+              <button class="btn-clear keep" onclick="downloadAdvancesExcel()">Download Excel</button>
+            </div>
           </div>
           <div class="table-wrap">
             <table class="table">
@@ -1185,6 +1243,7 @@ body.ro .section:not(#profileSection) .btn-clear:not(.keep) { display: none !imp
               <tbody id="advanceTable"></tbody>
             </table>
           </div>
+          <div class="pager" id="advPager"></div>
         </div>
       </div>
 
@@ -1477,7 +1536,7 @@ const EMP_PER_PAGE = 10;
 function nextLabourId() {
   const nums = labours.map(l => parseInt(String(l.id).replace(/\D/g, ''), 10) || 0);
   const next = (nums.length ? Math.max(...nums) : 0) + 1;
-  return 'PILB-' + String(next).padStart(3, '0');
+  return 'PI-' + String(next).padStart(3, '0');
 }
 
 function previewNextId() {
@@ -1502,6 +1561,23 @@ async function doLogin() {
   }
 }
 
+// One-time rename of old employee IDs PILB-001 -> PI-001 everywhere they are used
+// (employees, attendance, advances, works, weekly and monthly payments).
+function migrateEmployeeIds() {
+  if (!me || me.role === 'readonly') return;
+  const sets = { labours, attendance, advances, tasks, weeklyPays, monthlyPays };
+  if (!Object.values(sets).some(v => JSON.stringify(v).includes('PILB-'))) return;
+  const next = {};
+  for (const k of Object.keys(sets)) next[k] = JSON.parse(JSON.stringify(sets[k]).split('PILB-').join('PI-'));
+  const ids = next.labours.map(l => l.id);
+  if (new Set(ids).size !== ids.length) return;       // would create duplicate IDs: leave the data untouched
+  const changed = Object.keys(sets).filter(k => JSON.stringify(sets[k]) !== JSON.stringify(next[k]));
+  labours = next.labours; attendance = next.attendance; advances = next.advances;
+  tasks = next.tasks; weeklyPays = next.weeklyPays; monthlyPays = next.monthlyPays;
+  changed.forEach(k => save(k, sets[k] === undefined ? [] : ({ labours, attendance, advances, tasks, weeklyPays, monthlyPays })[k]));
+  notify('Employee IDs renamed from PILB- to PI-');
+}
+
 async function enterApp(user) {
   me = user;
   sessionAlertShown = false;
@@ -1513,6 +1589,7 @@ async function enterApp(user) {
     tasks = d.tasks || [];
     weeklyPays = d.weeklyPays || [];
     monthlyPays = d.monthlyPays || [];
+    migrateEmployeeIds();
   } catch (e) {
     if (e.message !== 'Session expired') alert(e.message);
     return;
@@ -1825,11 +1902,27 @@ async function createProfile() {
   document.body.classList.remove('booting');
 })();
 
+// Advance / Weekly / Monthly share one sidebar item, switched with tabs
+const PAY_TABS = [['advanceSection', 'Advance'], ['weeklySection', 'Weekly'], ['monthlySection', 'Monthly']];
+function injectPayTabs() {
+  PAY_TABS.forEach(([id]) => {
+    const sec = document.getElementById(id);
+    if (!sec || sec.querySelector('.pay-tabs')) return;
+    const bar = document.createElement('div');
+    bar.className = 'pay-tabs';
+    bar.innerHTML = PAY_TABS.map(([tid, label]) =>
+      `<button type="button" class="pay-tab ${tid === id ? 'active' : ''}" onclick="showSection('${tid}', payNav)">${label}</button>`).join('');
+    sec.insertBefore(bar, sec.firstChild);
+  });
+}
+injectPayTabs();
+
 function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
   document.getElementById(id).style.display = 'block';
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  if (PAY_TABS.some(x => x[0] === id)) document.getElementById('payNav').classList.add('active');
   const t = titles[id];
   if (t) {
     pageTitle.textContent = t[0];
@@ -1882,9 +1975,11 @@ function showSection(id, btn) {
 function updateStats() {
   const engineers = labours.filter(l => /engineer/i.test(l.profession || '')).length;
   const foremen = labours.filter(l => /foreman/i.test(l.profession || '')).length;
+  const supervisors = labours.filter(l => /supervisor/i.test(l.profession || '')).length;
   empStatEngineer.textContent = engineers;
   empStatExtra.textContent = foremen;
-  empStatLabour.textContent = labours.length - engineers - foremen;   // labours + engineers + foreman = total resources
+  empStatSupervisor.textContent = supervisors;
+  empStatLabour.textContent = labours.length - engineers - foremen - supervisors;   // labours + engineers + foreman + supervisors = total resources
   empStatTotal.textContent = labours.length;
   statLabour.textContent = labours.length;
   updateDashboardMoney();
@@ -1907,7 +2002,19 @@ function updateDashboardMoney() {
   statAdvanceMonth.textContent = fmt(adv);
 }
 
-// Profession menu: Engineer, Foreman, Labour (hover Labour for Plumber, Electrician, Helper)
+// Profession menu: Engineer, Foreman, Supervisor, Labour (hover Labour for Fitter, Helper, Carpenter, Mason), Other
+const KNOWN_PROFESSIONS = ['Engineer', 'Foreman', 'Supervisor', 'Labour', 'Fitter', 'Helper', 'Carpenter', 'Mason', 'Plumber', 'Electrician'];
+function otherSync() {
+  const isOther = lprofession.value === 'Other';
+  lotherWrap.style.display = isOther ? '' : 'none';
+  if (!isOther) lother.value = '';
+}
+// show a saved profession in the form: anything not in the menu is an "Other" description
+function setProfessionField(v) {
+  v = v || '';
+  if (v && !KNOWN_PROFESSIONS.includes(v)) { lprofession.value = 'Other'; otherSync(); lother.value = v; }
+  else { lprofession.value = v; otherSync(); }
+}
 function profPickOpen() { profPickList.classList.add('open'); }
 function profPickClose() { profPickList.classList.remove('open'); }
 
@@ -1917,8 +2024,10 @@ function profPickLeave() {
 
 function profPickChoose(v) {
   lprofession.value = v;
+  otherSync();
   profPickClose();
   lprofession.blur();
+  if (v === 'Other') lother.focus();
 }
 
 function profPickPress(e) {
@@ -1944,9 +2053,12 @@ document.addEventListener('click', e => {
 });
 
 function openEmployeeForm() {
+  editPickMode = false;
+  lpickWrap.style.display = 'none';
   editingLabourId = null;
   lname.value = '';
   lprofession.value = '';
+  otherSync();
   lrate.value = '';
   employeeFormTitle.textContent = 'Add Employee';
   labourSaveBtn.textContent = 'Save employee';
@@ -1957,9 +2069,12 @@ function openEmployeeForm() {
 }
 
 function closeEmployeeForm() {
+  editPickMode = false;
+  lpickWrap.style.display = 'none';
   editingLabourId = null;
   lname.value = '';
   lprofession.value = '';
+  otherSync();
   lrate.value = '';
   employeeModal.classList.remove('open');
   previewNextId();
@@ -1972,8 +2087,13 @@ document.addEventListener('keydown', e => {
 });
 
 function addLabour() {
+  if (editPickMode && !editingLabourId) return alert('Please select the employee you want to edit');
   const name = lname.value.trim();
-  const profession = lprofession.value.trim();
+  let profession = lprofession.value.trim();
+  if (profession === 'Other') {
+    profession = lother.value.trim().replace(/\s+/g, ' ');
+    if (!profession) return alert('Please enter the labour type in the Other box');
+  }
   const rate = lrate.value.trim();
 
   if (!name) return alert('Please enter a name');
@@ -2019,6 +2139,30 @@ function addLabour() {
   renderLabours(highlight);
   fillWageDropdowns();
   updateStats();
+}
+
+// Edit one attendance cell from the Employee tab. It replaces whatever the Attendance tab
+// already holds for that employee and day (both tabs read the same attendance records).
+function empAttEdit(inp) {
+  const [labourId, date] = inp.dataset.k.split('|');
+  const l = labours.find(x => x.id === labourId);
+  if (!l) return;
+  const ex = attendance.find(a => a.labourId === labourId && a.date === date);
+  if (attLockOwner(ex)) { renderLabours(); return; }   // days added from Work and Task stay locked
+  const note = inp.value.replace(/[^0-9.]/g, '').replace(/^(\d*\.?\d*).*$/, '$1').trim();
+  const old = ex ? String(ex.note || ex.status || '').trim() : '';
+  if (note === old) { inp.value = note; return; }
+  if (old !== '') {
+    const msg = 'Attendance for ' + l.name + ' on ' + fmtDate(date) + ' is already marked as ' + old + ' in the Attendance tab.\n\n' +
+      (note === '' ? 'Do you want to remove it?' : 'Do you want to replace it with ' + note + '?');
+    if (!confirm(msg)) { renderLabours(); return; }
+  }
+  attendance = attendance.filter(a => !(a.labourId === labourId && a.date === date));
+  if (note !== '') attendance.push({ labourId, name: l.name, date, note });
+  delete attDraft[inp.dataset.k];
+  save('attendance', attendance);
+  notify(old !== '' && note !== '' ? 'Attendance updated (replaced ' + old + ' with ' + note + ')' : 'Attendance saved');
+  renderLabours();
 }
 
 function goEmpPage(n) {
@@ -2140,14 +2284,14 @@ function renderLabours(highlightLast) {
   }
   const ctx = (empCtxCache = {}, empBuildCtx(empMonth.value));
 
-  let head = '<tr><th class="att-name">Name</th><th>Action</th>';
+  let head = '<tr><th class="att-name">Name</th>';
   ctx.dayKeys.forEach((dt, i) => { head += `<th class="${ctx.isSun(i + 1) ? 'att-sun' : ''}">${i + 1}</th>`; });
   head += '<th class="g-calc">Days total</th><th>Rate</th><th class="g-calc">Total</th>';
   ctx.sundays.forEach(dt => { head += `<th class="att-sun">${fmtDate(dt)}</th>`; });
   head += '<th class="g-calc">Kharchi</th><th>Advance by</th><th>Advance</th><th>Extra expenses</th><th>Last month balance</th><th class="g-calc">Grand total</th><th>Amount paid</th><th class="g-calc">Carry forward</th></tr>';
   empHead.innerHTML = head;
 
-  const cols = ctx.days + ctx.sundays.length + 13;
+  const cols = ctx.days + ctx.sundays.length + 12;
   if (!labours.length) {
     labourTable.innerHTML = `<tr><td colspan="${cols}" class="empty">No employees saved yet.</td></tr>`;
     empPager.innerHTML = '';
@@ -2174,18 +2318,22 @@ function renderLabours(highlightLast) {
   labourTable.innerHTML = pageList.map(l => {
     const r = empRowData(l, ctx);
     const cls = highlightLast && l === last ? 'row-new' : '';
-    const dayCells = r.dayNotes.map((n, i) =>
-      `<td class="${ctx.isSun(i + 1) ? 'att-sun-col' : ''}">${escHtml(n)}</td>`).join('');
+    const roEmp = me && me.role === 'readonly';
+    const dayCells = r.dayNotes.map((n, i) => {
+      const date = ctx.dayKeys[i];
+      const key = l.id + '|' + date;
+      const ex = attendance.find(a => a.labourId === l.id && a.date === date);
+      const wt = attLockOwner(ex);
+      const lockAttrs = wt
+        ? `readonly data-w="${escHtml(wt.id)}" title="Added from work: ${escHtml(wt.description)}" onclick="attLockedClick(this)"`
+        : '';
+      return `<td class="emp-day ${ctx.isSun(i + 1) ? 'att-sun-col' : ''}${wt ? ' att-locked' : ''}"><input class="emp-att" data-k="${escHtml(key)}" value="${escHtml(n)}" inputmode="decimal" maxlength="5" ` +
+        `oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^(\\d*\\.?\\d*).*$/, '$1')" onchange="empAttEdit(this)" ${lockAttrs} ${roEmp ? 'disabled' : ''}></td>`;
+    }).join('');
     const sunCells = r.sundayAmts.map(v => `<td>${v ? empRound(v) : ''}</td>`).join('');
     return `
       <tr class="${cls}">
         <td class="att-name"><span class="nm">${escHtml(l.name)}</span></td>
-        <td>
-          <div class="actions">
-            <button class="btn-edit" onclick="editLabour('${l.id}')">Edit</button>
-            <button class="btn-delete" onclick="deleteLabour('${l.id}')">Delete</button>
-          </div>
-        </td>
         ${dayCells}
         <td class="c-calc">${r.attTotal}</td>
         <td>${escHtml(r.rate)}</td>
@@ -2219,6 +2367,53 @@ function renderLabours(highlightLast) {
     </div>`;
 }
 
+function empPickOptions() {
+  return '<option value="">Select employee</option>' +
+    labours.map(l => `<option value="${escHtml(l.id)}">${escHtml(l.name)} (${escHtml(l.id)}${l.profession ? ' - ' + escHtml(l.profession) : ''})</option>`).join('');
+}
+// Edit employee: the same popup as "Add new Employee", with an employee list on top.
+// Pick the employee and his details fill in below, change them and press Update.
+let editPickMode = false;
+function openEditEmployee() {
+  if (!labours.length) return notify('No employees to edit');
+  editPickMode = true;
+  editingLabourId = null;
+  lid.value = '';
+  lname.value = '';
+  lprofession.value = '';
+  otherSync();
+  lrate.value = '';
+  lpick.innerHTML = empPickOptions();
+  lpickWrap.style.display = '';
+  employeeFormTitle.textContent = 'Edit Employee';
+  labourSaveBtn.textContent = 'Update employee';
+  profPickClose();
+  employeeModal.classList.add('open');
+  lpick.focus();
+}
+function pickEmployeeToEdit(id) {
+  const l = labours.find(x => x.id === id);
+  editingLabourId = l ? l.id : null;
+  lid.value = l ? l.id : '';
+  lname.value = l ? l.name : '';
+  setProfessionField(l ? l.profession : '');
+  lrate.value = l ? (l.rate || '') : '';
+}
+
+function openDeleteEmployee() {
+  if (!labours.length) return notify('No employees to delete');
+  delEmpSelect.innerHTML = '<option value="">Select employee</option>' +
+    labours.map(l => `<option value="${escHtml(l.id)}">${escHtml(l.name)} (${escHtml(l.id)}${l.profession ? ' - ' + escHtml(l.profession) : ''})</option>`).join('');
+  deleteEmpModal.classList.add('open');
+}
+function closeDeleteEmployee() { deleteEmpModal.classList.remove('open'); }
+function confirmDeleteEmployee() {
+  const id = delEmpSelect.value;
+  if (!id) return alert('Please select an employee');
+  closeDeleteEmployee();
+  deleteLabour(id);
+}
+
 function deleteLabour(id) {
   if (!confirm('Delete this employee record?')) return;
   labours = labours.filter(l => l.id !== id);
@@ -2233,10 +2428,12 @@ function deleteLabour(id) {
 function editLabour(id) {
   const l = labours.find(x => x.id === id);
   if (!l) return;
+  editPickMode = false;
+  lpickWrap.style.display = 'none';
   editingLabourId = id;
   lid.value = l.id;
   lname.value = l.name;
-  lprofession.value = l.profession || '';
+  setProfessionField(l.profession);
   lrate.value = l.rate || '';
   employeeFormTitle.textContent = 'Edit Employee';
   labourSaveBtn.textContent = 'Update employee';
@@ -2763,13 +2960,36 @@ function updateAdvanceTotal() {
   advPrevMonth.textContent = pd.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
 }
 
+const ADV_PER_PAGE = 10;
+let advPage = 1;
+function goAdvPage(n) { advPage = n; renderAdvances(); }
+
 function renderAdvances(highlightLast) {
   updateAdvanceTotal();
-  if (!advances.length) {
-    advanceTable.innerHTML = '<tr><td colspan="7" class="empty">No advance payments yet.</td></tr>';
+  if (highlightLast) advMonthFilter.value = '';        // show the new payment
+  const fm = advMonthFilter.value;                     // '' = all months, else YYYY-MM
+  const shown = advances.map((a, i) => ({ a, i })).filter(x => !fm || (x.a.date || '').startsWith(fm));
+  if (!shown.length) {
+    advanceTable.innerHTML = `<tr><td colspan="7" class="empty">${advances.length ? 'No advance payments in this month.' : 'No advance payments yet.'}</td></tr>`;
+    advPager.innerHTML = '';
     return;
   }
-  advanceTable.innerHTML = advances.map((a, i) => `
+  if (highlightLast) advPage = 1;                     // a new payment shows at the top of page 1
+  const pages = Math.ceil(shown.length / ADV_PER_PAGE);
+  if (advPage > pages) advPage = pages;
+  if (advPage < 1) advPage = 1;
+  const from = (advPage - 1) * ADV_PER_PAGE;
+  // newest first (edit / delete still use each record's real position in the list)
+  const pageRows = shown.slice().reverse().slice(from, from + ADV_PER_PAGE);
+  advPager.innerHTML = pages > 1 ? `
+    <div class="pager-info">Showing ${from + 1}-${from + pageRows.length} of ${shown.length}</div>
+    <div class="pager-btns">
+      <button class="pager-btn pager-ic" title="Previous page" aria-label="Previous page" onclick="goAdvPage(${advPage - 1})" ${advPage === 1 ? 'disabled' : ''}>${ICON_PREV}</button>
+      <button class="pager-btn active" disabled>${advPage}</button>
+      <span class="pager-gap">of ${pages}</span>
+      <button class="pager-btn pager-ic" title="Next page" aria-label="Next page" onclick="goAdvPage(${advPage + 1})" ${advPage === pages ? 'disabled' : ''}>${ICON_NEXT}</button>
+    </div>` : '';
+  advanceTable.innerHTML = pageRows.map(({ a, i }) => `
     <tr class="${highlightLast && i === advances.length - 1 ? 'row-new' : ''}">
       <td>${fmtDate(a.date)}</td>
       <td>${escHtml(a.name)}</td>
@@ -2839,6 +3059,8 @@ const TASK_TAB_STATUS = { new: 'To be started', prog: 'In progress', done: 'Comp
 const TASK_CARDS_PER_PAGE = 2;
 const TASK_MAX_PHOTOS = 5;
 let taskTab = 'new';
+let taskView = 'ongoing';   // 'ongoing' = new + in progress, 'done' = completed works
+function setTaskView(v) { taskView = v; taskPage = 1; renderTasks(); }
 let taskPhotos = [];
 
 function taskStatusBadge(st) {
@@ -3004,7 +3226,8 @@ function saveTask() {
         employees: taskSelected.map(id => ({ id, name: (getLabour(id) || {}).name || id }))
       };
       const gaps = taskCompletionGaps(fromDpr ? dprT : probe, taskPhotos.length);
-      if (gaps.photos || gaps.missing.length) return showCompletionBlock(gaps, null);
+      if (gaps.missing.length) return showCompletionBlock(gaps, null);
+      if (gaps.photos && !confirm(NO_PHOTO_WARNING)) return;
     }
   }
 
@@ -3028,6 +3251,7 @@ function saveTask() {
   }
   save('tasks', tasks);
   taskTab = Object.keys(TASK_TAB_STATUS).find(k => TASK_TAB_STATUS[k] === data.status) || 'new';
+  taskView = data.status === 'Completed' ? 'done' : 'ongoing';
   taskPage = 1;
   closeTaskForm();
   renderTasks();
@@ -3115,9 +3339,14 @@ function renderTasks() {
   // ---- work cards: every work, newest first (filtered by the search box) ----
   const rawQ = (taskSearch.value || '').trim();
   const q = rawQ.toLowerCase();
-  const list = taskOrder(tasks.filter(t => taskMatchesSearch(t, q)));
+  const doneCount = tasks.filter(t => t.status === 'Completed').length;
+  workTabs.innerHTML =
+    `<button type="button" class="pay-tab ${taskView === 'ongoing' ? 'active' : ''}" onclick="setTaskView('ongoing')">Ongoing works (${tasks.length - doneCount})</button>` +
+    `<button type="button" class="pay-tab ${taskView === 'done' ? 'active' : ''}" onclick="setTaskView('done')">Completed works (${doneCount})</button>`;
+  const inView = t => (taskView === 'done') === (t.status === 'Completed');
+  const list = taskOrder(tasks.filter(t => inView(t) && taskMatchesSearch(t, q)));
   if (!list.length) {
-    const msg = !q ? 'No work yet.' : `No work matches &ldquo;${escHtml(rawQ)}&rdquo;.`;
+    const msg = q ? `No work matches &ldquo;${escHtml(rawQ)}&rdquo;.` : (taskView === 'done' ? 'No completed work yet.' : 'No ongoing work.');
     taskCards.innerHTML = `<div class="card"><div class="empty">${msg}</div></div>`;
     taskPager.innerHTML = '';
     return;
@@ -3175,12 +3404,15 @@ function downloadDailyReport() {
     ['', '']
   ];
   const headRow = rows.length;
-  rows.push(['Task', 'Location', 'Employees', 'No. of employees', 'Days taken']);
+  rows.push(['Task', 'Location', 'Employee', 'No. of employees', 'Days taken']);
   active.forEach(t => {
     const names = taskEmpNames(t);
-    rows.push([t.description, t.location, names.join(', '), names.length, taskDaysText(t)]);
+    if (!names.length) { rows.push([t.description, t.location, '', 0, taskDaysText(t)]); return; }
+    // the task, location, count and days appear once; the employees are listed under it, one per row
+    names.forEach((n, i) => rows.push([i === 0 ? t.description : '', i === 0 ? t.location : '', n, i === 0 ? names.length : '', i === 0 ? taskDaysText(t) : '']));
+    rows.push(['', '', '', '', '']);
   });
-  saveXlsxFile(makeXlsxBook([{ name: 'Daily report', rows, widths: [30, 22, 54, 16, 18], bold: [0, headRow] }]),
+  saveXlsxFile(makeXlsxBook([{ name: 'Daily report', rows, widths: [30, 22, 30, 16, 18], bold: [0, headRow] }]),
     'Daily_Report_' + day + '.xlsx');
 }
 
@@ -3214,8 +3446,18 @@ function showTaskConflict(conflicts, starting) {
   );
 }
 
+// date of the most recent activity of a work (last daily report day, else its end / start date)
+function taskLastDate(t) {
+  if (t.days) { const k = Object.keys(t.days).sort(); if (k.length) return k[k.length - 1]; }
+  return t.endDate || t.startDate || '';
+}
+// newest first = the work with the latest date on top; works with the same date: the one added last first
 function taskOrder(arr) {
-  return taskSort.value === 'old' ? [...arr] : [...arr].reverse();   // arrays are in the order works were added
+  const old = taskSort.value === 'old';
+  const dir = old ? 1 : -1;
+  return arr.map((t, i) => ({ t, i, d: taskLastDate(t) }))
+    .sort((a, b) => (a.d === b.d ? 0 : (a.d < b.d ? -1 : 1)) * dir || (a.i - b.i) * dir)
+    .map(x => x.t);
 }
 
 function taskSortChanged() {
@@ -3227,6 +3469,9 @@ function taskSortChanged() {
 
 // What is still missing before a work may be marked completed:
 // a photo, and an attendance entry (0 / A counts) for every employee on every date.
+// a work photo is only recommended: closing a work without one asks for confirmation
+const NO_PHOTO_WARNING = 'No photos have been added to this work.\n\nAre you sure you want to mark it as complete?';
+
 function taskCompletionGaps(t, photoCount) {
   const idx = taskAttIndex();
   const dates = taskDates(t);
@@ -3250,7 +3495,6 @@ function showCompletionBlock(gaps, workId) {
       (gaps.missing.length > 6 ? '<br>&bull; and ' + (gaps.missing.length - 6) + ' more employee' + (gaps.missing.length - 6 === 1 ? '' : 's') : '') +
       '<br>Type <b>0</b> (or <b>A</b>) for a day the employee did not work.');
   }
-  if (gaps.photos) parts.push('<b>No work photo is uploaded.</b> Add at least one photo of the work.');
   showInfo('This work cannot be completed yet', parts.join('<br><br>'), workId, 'Open this work');
 }
 
@@ -3362,6 +3606,7 @@ function taskCardHtml(t, idx) {
           </div>
         </div>
         <div class="work-actions">
+          ${(!taskRO && t.status !== 'Completed') ? `<button class="btn-complete" title="Mark this work as complete" data-id="${escHtml(t.id)}" onclick="setTaskStatus(this.dataset.id, 'Completed')">Mark as complete</button>` : ''}
           <button class="btn-dl icon-btn" title="Download report" aria-label="Download report" data-id="${escHtml(t.id)}" onclick="downloadTaskExcel(this.dataset.id)">${ICON_DL}</button>
           <button class="btn-edit icon-btn" title="Edit" aria-label="Edit" data-id="${escHtml(t.id)}" onclick="editTask(this.dataset.id)">${ICON_EDIT}</button>
           <button class="btn-delete icon-btn" title="Delete" aria-label="Delete" data-id="${escHtml(t.id)}" onclick="deleteTask(this.dataset.id)">${ICON_DEL}</button>
@@ -3478,7 +3723,8 @@ function goToWork(id) {
   if (!t) return;
   showSection('taskSection', document.querySelector('.nav-btn[onclick*="taskSection"]'));
   taskSearch.value = '';
-  const list = taskOrder(tasks);
+  taskView = t.status === 'Completed' ? 'done' : 'ongoing';     // open the tab this work is in
+  const list = taskOrder(tasks.filter(x => (taskView === 'done') === (x.status === 'Completed')));
   taskPage = Math.floor(list.findIndex(x => x.id === id) / TASK_CARDS_PER_PAGE) + 1;
   renderTasks();
   const el = document.getElementById('work_' + id);
@@ -3494,13 +3740,14 @@ function setTaskStatus(id, status) {
   }
   if (status === 'Completed') {
     const gaps = taskCompletionGaps(t, (t.photos || []).length);
-    if (gaps.photos || gaps.missing.length) return showCompletionBlock(gaps, t.id);
+    if (gaps.missing.length) return showCompletionBlock(gaps, t.id);
+    if (gaps.photos && !confirm(NO_PHOTO_WARNING)) return;
   }
   t.status = status;
   save('tasks', tasks);
   taskPage = 1;
   renderTasks();
-  notify('Moved to ' + TASK_STATUS_LABEL[status]);
+  notify(status === 'Completed' ? 'Work marked as complete. It is now under Completed works.' : 'Moved to ' + TASK_STATUS_LABEL[status]);
 }
 
 // ---------- popup form + photos ----------
@@ -3625,6 +3872,7 @@ function downloadTaskExcel(id) {
     ...r.vals.map(v => v === '' ? '' : (isNaN(Number(v)) ? v : Number(v))),
     r.rate
   ]));
+  rows.push(['', '']);                                   // one blank line before the totals
   const attRow = rows.length;
   rows.push(['Total attendance', c.totalDays]);
   rows.push(['Total cost', c.totalCost]);
@@ -4020,7 +4268,7 @@ function dprBlockHtml(w, n) {
     const l = getLabour(x.id);
     return `<tr>
       <td class="att-name">${escHtml(l ? l.name : x.id)}</td>
-      <td><input class="dpr-att" value="${escHtml(x.att)}" inputmode="decimal" maxlength="5" placeholder="1" data-k="${k}" data-id="${escHtml(x.id)}" oninput="dprAttInput(this)"></td>
+      <td><input class="dpr-att" value="${escHtml(x.att)}" inputmode="decimal" maxlength="5" placeholder="1.5" data-k="${k}" data-id="${escHtml(x.id)}" oninput="dprAttInput(this)"></td>
       <td><button type="button" class="btn-delete icon-btn" title="Remove labour" aria-label="Remove labour" data-k="${k}" data-id="${escHtml(x.id)}" onclick="dprRemoveLabour(this.dataset.k, this.dataset.id)">${ICON_DEL}</button></td>
     </tr>`;
   }).join('') : '<tr><td colspan="3" class="empty">No labour added yet.</td></tr>';
@@ -4157,7 +4405,7 @@ function dprPickChoose(k, id) {
   const w = dprFind(k);
   if (!w || w.labours.some(x => x.id === id)) return;
   if (dprBusyMap(dprDate.value, k).has(id)) return;
-  w.labours.push({ id, att: '1' });          // 1 day by default - change to 1.5, 2 ... if needed
+  w.labours.push({ id, att: '1.5' });        // standard attendance (hazri) is 1.5 - change it if needed
   dprDirty = true;
   renderDprWorks();
   const inp = document.getElementById('dprPickInput_' + k);
@@ -4370,12 +4618,19 @@ function dprDownload(date) {
   const headRow = rows.length;
   rows.push(['Work', 'Location', 'Labour', 'Attendance']);
   let total = 0;
-  works.forEach(t => t.days[date].labourIds.forEach(id => {
-    const l = getLabour(id);
-    const n = attNum(dprAttOf(id, date));
-    total += n;
-    rows.push([t.description, t.location, l ? l.name : id, n]);
-  }));
+  works.forEach((t, wi) => {
+    if (wi > 0) rows.push(['', '', '', '']);           // blank line between works
+    const ids = t.days[date].labourIds;
+    if (!ids.length) rows.push([t.description, t.location, '', '']);
+    // the work and its location appear once; the labours are listed under it
+    ids.forEach((id, i) => {
+      const l = getLabour(id);
+      const n = attNum(dprAttOf(id, date));
+      total += n;
+      rows.push([i === 0 ? t.description : '', i === 0 ? t.location : '', l ? l.name : id, n]);
+    });
+  });
+  rows.push(['', '', '', '']);
   rows.push(['', '', 'Total', empRound(total)]);
   saveXlsxFile(makeXlsx(rows, [30, 24, 26, 14], [0, headRow, rows.length - 1]), 'Daily_Progress_Report_' + date + '.xlsx');
 }
